@@ -3,16 +3,16 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.8
-  - pandas=1.1.4
-  - altair=4.1.0
+  - python=3.9
+  - pandas=2.2.1
+  - altair=5.2.0
   - vega_datasets=0.9.0
-  - altair_data_server
-  - matplotlib
+  - altair_data_server=0.4.1
+  - matplotlib=3.8.3
   - pip
   - pip:
-    - dash==1.18.1
-    - dash-leaflet
-    - dash-extensions
-    - dash_bootstrap_components
-    - plotly==4.14.3
+    - dash==2.16.1
+    - dash-leaflet==1.0.15
+    - dash-extensions==1.0.14
+    - dash_bootstrap_components==1.5.0
+    - plotly==5.20.0
