@@ -1,1 +1,3 @@
-# DSCI-532_2024_2_pollution_tracker
+# Pollution Tracker Dashboard
+
+The Pollution Tracker Dashboard utilizes the "World Air Quality Data 2024 (Updated)" dataset for visualizing global air pollution levels. With data on pollutants like PM2.5 and NO2 from around the world, our dashboard makes it easy to see current conditions and trends. It's designed for anyone interested in the environment, health, or policy to get a clear picture of air quality and how it's changing. Our project is built on data sourced from OpenDataSoft, guaranteeing both the reliability and the transparency of the information we provide.
