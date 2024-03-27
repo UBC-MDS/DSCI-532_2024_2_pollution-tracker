@@ -1,0 +1,18 @@
+name: 'pollution-tracker'
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - pandas=1.1.4
+  - altair=4.1.0
+  - vega_datasets=0.9.0
+  - altair_data_server
+  - matplotlib
+  - pip
+  - pip:
+    - dash==1.18.1
+    - dash-leaflet
+    - dash-extensions
+    - dash_bootstrap_components
+    - plotly==4.14.3
