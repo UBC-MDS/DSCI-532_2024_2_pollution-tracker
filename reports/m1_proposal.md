@@ -24,11 +24,19 @@ We will use these columns to derive new variables, such as an [Air Quality Index
 
 ## Research Questions
 
-Persona: Dr. Hu is a public health official in the Ministry of Health. She wishes to monitor public health outcomes, advise on health policy, and initiate public health programs. Dr. Hu is not a data science professional but she has immense knowledge of epidemiology, medicine, and public health. 
+Dr. Hu is a public health official in the Ministry of Health. She wishes to monitor public health outcomes, advise on health policy, and initiate public health programs. Dr. Hu is not a data science professional but she has immense knowledge of epidemiology, medicine, and public health. 
 
-Overall Goal: Dr. Hu wishes to understand the impact of air pollution on public health and identify areas where government intervention can reduce negative health outcomes. She plans to use this dashboard to identify problem areas, recommend specific courses of action for the public health ministry, and deliver new health campaigns tailored to the needs of citizens to mitigate the ill-effects of air pollution. 
+Dr. Hu wishes to understand the impact of air pollution on public health and identify areas where government intervention can reduce negative health outcomes. She plans to use this dashboard to identify problem areas, recommend specific courses of action for the public health ministry, and deliver new health campaigns tailored to the needs of citizens to mitigate the ill-effects of air pollution. 
 
+Through the Pollution Tracker dashboard, Dr. Hu aims to:
 
+[Explore] global and local air pollution trends over several years to gain an in-depth understanding of pollution patterns and their evolution over time.
+
+[Compare] levels of key pollutants (PM, CO, Ozone, NOx, SOx) across various regions to pinpoint differences and similarities in air quality.
+
+[Identify] pollution hotspots where urgent action is needed, and highlight times when pollution levels rise significantly, to sound the alarm for potential air quality crises.
+
+[Derive] actionable insights by analyzing pollution levels, trends, rates of change, and anomalies. These insights will inform public health advisories, guide health policy formulation, and mitigate air pollution health impacts for a healthier and happier population.
 
 ## App Sketch and Description
 
