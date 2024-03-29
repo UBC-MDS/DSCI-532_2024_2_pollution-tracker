@@ -24,6 +24,9 @@ We will use these columns to derive new variables, such as an [Air Quality Index
 
 ## Research Questions
 
+Persona: Dr. Hu is a public health official in the Ministry of Health. She wishes to monitor public health outcomes, advise on health policy, and initiate public health programs. Dr. Hu is not a data science professional but she has immense knowledge of epidemiology, medicine, and public health. 
+
+
 ## App Sketch and Description
 
 
