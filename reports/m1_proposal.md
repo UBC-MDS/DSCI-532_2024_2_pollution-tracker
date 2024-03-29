@@ -26,6 +26,9 @@ We will use these columns to derive new variables, such as an [Air Quality Index
 
 Persona: Dr. Hu is a public health official in the Ministry of Health. She wishes to monitor public health outcomes, advise on health policy, and initiate public health programs. Dr. Hu is not a data science professional but she has immense knowledge of epidemiology, medicine, and public health. 
 
+Overall Goal: Dr. Hu wishes to understand the impact of air pollution on public health and identify areas where government intervention can reduce negative health outcomes. She plans to use this dashboard to identify problem areas, recommend specific courses of action for the public health ministry, and deliver new health campaigns tailored to the needs of citizens to mitigate the ill-effects of air pollution. 
+
+
 
 ## App Sketch and Description
 
