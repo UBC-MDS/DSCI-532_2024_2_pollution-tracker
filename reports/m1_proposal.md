@@ -50,7 +50,18 @@ Through the Pollution Tracker dashboard, Dr. Hu aims to:
 
 ## App Sketch and Description
 ![app sketch](../img/app sketch.png)
+The dashboard, labeled "Pollutant Tracker," appears designed to provide an interactive and comprehensive overview of global pollution data. Here's a detailed description of its components:
 
+1. Type of Pollutant Filter: Users can select the type of pollutant they want to see data for. Options include SO2, NO, PM2.5, CO, NOX, etc.
+2. Region Filter: There is a filter option that allows users to select one or multiple regions of interest. It's depicted as a dropdown menu with options.
+3. Country Dropdown Box: A dropdown menu to select a specific country for which the user wants to see pollutant data.
+4. Time Selection Bar: This feature lets users choose a time frame for the data displayed.
+5. Worldwide/Regional Map: The central part of the dashboard is reserved for a map that is intended to display the levels of pollution across different regions. The map currently does not have data displayed but indicates that this is to be determined (TBD).
+6. Legend: There is a legend next to the map, which will presumably show different levels of pollution with a corresponding color or pattern coding system.
+7. Top Countries of Pollutant: This appears to be a bar graph that will rank the top 15 countries based on the level of a selected pollutant.
+8. Trend of Pollutant over Time: This is a line graph illustrating the trend of a selected pollutant over time, specifically for the countries or regions of interest chosen by the user.
+
+Overall, the dashboard is designed to be interactive, allowing users to customize the data they are viewing through various filters. It aims to provide a visual representation of pollution data that can help users analyze trends and compare pollution levels across different geographical areas and times.
 
 ### Bibliography
 Air quality, energy and health (no date) World Health Organization. Available at: https://www.who.int/teams/environment-climate-change-and-health/air-quality-energy-and-health/health-impacts (Accessed: 29 March 2024).
