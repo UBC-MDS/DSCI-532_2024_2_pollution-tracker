@@ -33,7 +33,7 @@ Through the Pollution Tracker dashboard, Dr. Hu aims to:
 * Explore global and local air pollution trends over several years to gain an in-depth understanding of pollution patterns and their evolution over time.
 * Compare levels of key pollutants (PM, CO, Ozone, NOx, SOx) across various regions to pinpoint differences and similarities in air quality.
 * [Identify] pollution hotspots where urgent action is needed, and highlight times when pollution levels rise significantly, to sound the alarm for potential air quality crises.
-* [Derive] actionable insights by analyzing pollution levels, trends, rates of change, and anomalies. These insights will inform public health advisories, guide health policy formulation, and mitigate air pollution health impacts for a healthier and happier population.
+* Derive actionable insights by analyzing pollution levels, trends, rates of change, and anomalies. These insights will inform public health advisories, guide health policy formulation, and mitigate air pollution health impacts for a healthier and happier population.
 
 **Usage Scenarios:** Dr. Hu logs into the “Pollution Tracker” dashboard and app designed by Group2 Data Science Consultants Inc. She wishes to prepare a comprehensive report to be shared with both technical and non-technical stakeholders within the ministry. She follows these steps to build her report:
 
