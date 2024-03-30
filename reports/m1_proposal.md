@@ -49,7 +49,7 @@ Through the Pollution Tracker dashboard, Dr. Hu aims to:
 
 
 ## App Sketch and Description
-![app sketch](../img/app sketch.png)
+![app sketch](../img/app_sketch.png)
 The dashboard, labeled "Pollutant Tracker," appears designed to provide an interactive and comprehensive overview of global pollution data. Here's a detailed description of its components:
 
 1. Type of Pollutant Filter: Users can select the type of pollutant they want to see data for. Options include SO2, NO, PM2.5, CO, NOX, etc.
