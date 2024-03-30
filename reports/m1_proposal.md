@@ -38,6 +38,11 @@ Through the Pollution Tracker dashboard, Dr. Hu aims to:
 
 [Derive] actionable insights by analyzing pollution levels, trends, rates of change, and anomalies. These insights will inform public health advisories, guide health policy formulation, and mitigate air pollution health impacts for a healthier and happier population.
 
+Usage Scenarios: Dr. Hu logs into the “Pollution Tracker” dashboard and app. She wishes to prepare a comprehensive report to be shared with both technical and non-technical stakeholders within the ministry. She follows the next steps to build her report:
+
+Dr. Hu selects her country from a sidebar with a dropdown menu functionality. This sets the granularity level to her country and displays interactive line charts and bar charts with trends, changes, and patterns in ozone, PM2.5, CO, SOx, and NOx levels for her country. 
+
+
 ## App Sketch and Description
 
 
