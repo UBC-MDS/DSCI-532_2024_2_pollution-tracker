@@ -49,6 +49,7 @@ Through the Pollution Tracker dashboard, Dr. Hu aims to:
 
 
 ## App Sketch and Description
+![app sketch](../img/app sketch.png)
 
 
 ### Bibliography
