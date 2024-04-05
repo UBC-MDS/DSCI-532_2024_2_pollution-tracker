@@ -60,8 +60,8 @@ app.layout = html.Div([
                     {"label": country, "value": country}
                     for country in list(
                         data['countryname'].dropna().unique())],
-            value='Japan',  # default selected value
-            multi=True
+            value='Japan'#,  # default selected value
+            #multi=True
         ),
     ]),
     
@@ -142,21 +142,21 @@ def plot_map():
     Output("top_countries_chart", "spec"),
     Input("pollutant_type_filter", "value"),
     #Input("region_filter", "value"),
-    Input("country_filter", "value"),
+    #Input("country_filter", "value"),
     Input("date_range_picker", "value"),
 )
-def plot_bar(pollutant, countries, time_range):
+def plot_bar(pollutant, time_range):
     start_date, end_date = time_range
     start_date = pd.to_datetime(start_date).date()
     end_date = pd.to_datetime(end_date).date()
-    if not isinstance(countries, list):
-        countries = [countries]
+    #if not isinstance(countries, list):
+    #    countries = [countries]
 
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
         #(pollutant['region'].isin(regions)) &
-        (data['countryname'].isin(countries)) &
+    #    (data['countryname'].isin(countries)) &
         (data['pollutant'] == pollutant)
     ]
     top_countries_data = filtered_data.groupby('countryname', as_index=False)['value'].mean().sort_values(by='value', ascending=False).head(15)
@@ -169,7 +169,8 @@ def plot_bar(pollutant, countries, time_range):
         ]
     ).properties(
         title='Top 15 Countries by AQI Value',
-        width=300
+        width=250,
+        height=300
     ).to_dict()
     return bar
 
@@ -185,21 +186,21 @@ def plot_line(pollutant, countries, time_range):
     start_date, end_date = time_range
     start_date = pd.to_datetime(start_date).date()
     end_date = pd.to_datetime(end_date).date()
-    if not isinstance(countries, list):
-        countries = [countries]
+    #if not isinstance(countries, list):
+    #    countries = [countries]
     
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
         #(pollutant['region'].isin(regions)) &
-        (data['countryname'].isin(countries)) &
+        (data['countryname']== countries) &
         (data['pollutant'] == pollutant)
     ]
     filtered_data['time'] = filtered_data['time'].astype(str)
-    line = alt.Chart(filtered_data).mark_line().encode(
+    line = alt.Chart(filtered_data).mark_line(color='black').encode(
         x=alt.X('time:T', axis=alt.Axis(title='Date', format='%Y-%m')), 
         y=alt.Y('value:Q', axis=alt.Axis(title='Value')),  
-        color=alt.Color('countryname:N', legend=alt.Legend(title='Country')),
+        #color=alt.Color('countryname:N', legend=alt.Legend(title='Country')),
         tooltip=[
         alt.Tooltip('time:T', title='Date', format='%Y-%m-%d'),
         alt.Tooltip('value:Q', title='AQI value'),
@@ -207,7 +208,8 @@ def plot_line(pollutant, countries, time_range):
         ]
         ).properties(
             title='Air Quality Index (AQI) Over Time',
-            width=300
+            width=400,
+            height=300
         ).to_dict()
     return line
 
@@ -223,14 +225,14 @@ def summary(pollutant, countries, time_range):
     start_date, end_date = time_range
     start_date = pd.to_datetime(start_date).date()
     end_date = pd.to_datetime(end_date).date()
-    if not isinstance(countries, list):
-        countries = [countries]
+    #if not isinstance(countries, list):
+    #    countries = [countries]
     
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
         #(pollutant['region'].isin(regions)) &
-        (data['countryname'].isin(countries)) &
+        (data['countryname'] == countries) &
         (data['pollutant'] == pollutant)
     ]
     summary = filtered_data.describe().reset_index()
