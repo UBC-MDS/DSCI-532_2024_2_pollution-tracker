@@ -25,104 +25,72 @@ app = dash.Dash(
 server = app.server
 
 app.layout = html.Div([
-    html.H1('Pollutant Tracker'),
-    
-    # Filter by Type of Pollutant
-    html.Div([
-        html.Label('Select type of pollutant shown on the dashboard'),
-        dcc.RadioItems(
-            id='pollutant_type_filter',
-            options=['PM2.5','SO2','NO','CO','NOX','NO2','PM1','PM10'],
-            value='PM2.5',  
-            labelStyle={'display': 'inline-block', 'margin-right': '20px', 'width': '10%'}  
-        ),
-    ]),
-    
-    # Filter by Region
-    html.Div([
-        html.Label('Select region(s)'),
-        dcc.Dropdown(
-            id='region_filter',
-            options=[
-                    {"label": region, "value": region}
-                    for region in ['Africa', 'Antarctica', 'Asia', 'Europe', 'North America', 'Oceania', 'South America']],
-            value=['Asia'],  # default selected value
-            multi=True
-        ),
-    ]),
-    
-    # Dropdown for Country
-    html.Div([
-        html.Label('Select country'),
-        dcc.Dropdown(
-            id='country_filter',
-            options=[
-                    {"label": country, "value": country}
-                    for country in list(
-                        data['countryname'].dropna().unique())],
-            value='Japan'#,  # default selected value
-            #multi=True
-        ),
-    ]),
-    
-    # Filter by Time
-    # html.Div([
-    #     html.Label('Select time period'),
-    #     dcc.RangeSlider(
-    #         id='time_filter',
-    #         min=2020,
-    #         max=2023,
-    #         value=[2021, 2023],  # default selected values
-    #         marks={i: str(i) for i in range(2020, 2024)},
-    #         step=1
-    #     ),
-    # ]),
-
-    html.Div([
-        html.Label('Select time period'),
-        dmc.DateRangePicker(
-            id="date_range_picker",
-            description="Please select the data you want to visualize",
-            minDate=data['time'].min(),
-            value=[data['time'].min(), data['time'].max()],
-            style={"width": 330},
-        )
-    ]),
-
-    
-    # Map for showing pollution levels
-    html.Div([
-        html.Label('Pollutant Tracker'),
-        # Map
-        dcc.Graph(id='pollution_map', figure={}),
-    ]),
-    
-    # Side-by-side charts for top countries and trend over time
+    dbc.Row(html.H1('Pollutant Tracker')),
     dbc.Row([
         dbc.Col([
-            html.H3('Top 15 Countries of Pollutant'),
-            dvc.Vega(id='top_countries_chart', spec={},style={'width': '100%'})
-        ], md=4),
+            # Filters column
+            html.Div([
+                html.Label('Select type of pollutant shown on the dashboard'),
+                dcc.RadioItems(
+                    id='pollutant_type_filter',
+                    options=[{'label': i, 'value': i} for i in ['PM2.5', 'SO2', 'NO', 'CO', 'NOX', 'NO2', 'PM1', 'PM10']],
+                    value='PM2.5',  
+                    labelStyle={'display': 'inline-block', 'margin-right': '20px'}  
+                ),
+                html.Label('Select region(s)'),
+                dcc.Dropdown(
+                    id='region_filter',
+                    options=[{"label": region, "value": region} for region in ['Africa', 'Antarctica', 'Asia', 'Europe', 'North America', 'Oceania', 'South America']],
+                    value=['Asia'],  # default selected value
+                    multi=True
+                ),
+                html.Label('Select country'),
+                dcc.Dropdown(
+                    id='country_filter',
+                    options=[{"label": country, "value": country} for country in data['countryname']],
+                    value='Japan',  # default selected value
+                ),
+                html.Label('Select time period'),
+                dmc.DateRangePicker(
+                    id="date_range_picker",
+                    minDate=min(data['time']),
+                    maxDate=max(data['time']),
+                    value=[min(data['time']), max(data['time'])],
+                    style={"width": "100%"},
+                )
+            ], style={'margin-right': '20px'})
+        ], width=3),  # Filters column width
         dbc.Col([
-            html.H3('Trend of Pollutant over time'),
-            dvc.Vega(id='trend_chart', spec={}, style={'width': '100%'})
-        ], md=5),
-        dbc.Col([
-            html.H3('Data Summary'),
-            html.Div(
-                dash_table.DataTable(
-                    id='data-summary-table',
-                    style_cell={'textAlign': 'center'},
-                    style_header={
-                        'backgroundColor': 'white',
-                        'fontWeight': 'bold'
-                    },
-                ), style={'width': '80%'}
-            )
-            #dcc.Markdown(id='summary',style={'width': '100%'})
-        ], md=3),
-    ]),
+            # Main content column
+            html.Label('Pollution Tracker'),
+            dcc.Graph(id='pollution_map', figure={}),  # Placeholder for the pollution map
+            dbc.Row([
+                dbc.Col([
+                    html.H3('Top 15 Countries of Pollutant'),
+                    dvc.Vega(id='top_countries_chart', spec={}, style={'width': '100%', 'height': '100%'})
+                ], md=4),
+                dbc.Col([
+                    html.H3('Trend of Pollutant over time'),
+                    dvc.Vega(id='trend_chart', spec={}, style={'width': '100%', 'height': '100%'})
+                ], md=5),
+                dbc.Col(
+                    html.Div([
+                        html.H3('Data Summary'),
+                        dash_table.DataTable(
+                            id='data-summary-table',
+                            style_cell={'textAlign': 'center'},
+                            style_header={
+                                'backgroundColor': 'white',
+                                'fontWeight': 'bold'
+                            },
+                        )
+                    ], style={'width': '80%'}),
+                md=3),
+            ]),
+        ], width=9)  # Main content column width
+    ])
 ])
+
 
 
 
