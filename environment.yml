@@ -9,6 +9,7 @@ dependencies:
   - vega_datasets=0.9.0
   - altair_data_server=0.4.1
   - matplotlib=3.8.3
+  - gunicorn==21.2
   - pip
   - pip:
     - dash==2.16.1
