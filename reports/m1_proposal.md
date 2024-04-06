@@ -1,4 +1,5 @@
 # Milestone 1 Proposal - Pollution Tracker
+
 Group 2 - Merete Lutz, Kun Ya, Weiran Zhao, Sid Grover
 
 ## Motivation and Purpose
@@ -44,12 +45,10 @@ Through the Pollution Tracker dashboard, Dr. Hu aims to:
 5. Using the AQI metrics provided by the dashboard, she identifies areas with consistently poor air quality. She cross-references this data with public health reports on respiratory issues during the same period and spots a clear correlation.
 6. Based on her findings, Dr. Hu suggests policy measures to reduce pollutant levels across various cities. She works with municipal authorities to implement varying programs that promote the burning of cleaner fuel. Over time, Dr. Hu can use the various plots to measure the effectiveness of the impact of her policies. She can use the line charts to see how pollutant levels, over the same period, change year-over-year. She can also use the pollutant map, comparing it to pollutant maps at previous times, to visually inspect if her policies made any difference. 
 
-
-
-
-
 ## App Sketch and Description
-![app sketch](../img/app_sketch.png)
+
+![app sketch](../img/sketch.png)
+
 The dashboard, labeled "Pollutant Tracker," appears designed to provide an interactive and comprehensive overview of global pollution data. Here's a detailed description of its components:
 
 1. Type of Pollutant Filter: Users can select the type of pollutant they want to see data for. Options include SO2, NO, PM2.5, CO, NOX, etc.
@@ -64,4 +63,5 @@ The dashboard, labeled "Pollutant Tracker," appears designed to provide an inter
 Overall, the dashboard is designed to be interactive, allowing users to customize the data they are viewing through various filters. It aims to provide a visual representation of pollution data that can help users analyze trends and compare pollution levels across different geographical areas and times.
 
 ### Bibliography
+
 Air quality, energy and health (no date) World Health Organization. Available at: https://www.who.int/teams/environment-climate-change-and-health/air-quality-energy-and-health/health-impacts (Accessed: 29 March 2024).
