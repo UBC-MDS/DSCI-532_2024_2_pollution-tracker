@@ -18,6 +18,40 @@ data = data.rename(columns={'Last Updated': 'time',
                      'Pollutant': 'pollutant'})
 data['time'] = pd.to_datetime(data['time']).dt.date
 
+pollutants = ['NO', 'NO2', 'NOX', 'SO2', 'PM2.5', 'CO', 'O3', 'PM10', 'PM1']
+
+#Engineer the Overall AQI Feature 
+def aqi_calculation(C, breakpoints):
+    for C_low, C_high, I_low, I_high in breakpoints:
+        if C_low <= C <= C_high:
+            return ((I_high - I_low) / (C_high - C_low)) * (C - C_low) + I_low
+    return np.nan
+#AQI breakpoints, based on the US EPA System
+    #https://aqs.epa.gov/aqsweb/documents/codetables/aqi_breakpoints.html
+    breakpoints = {
+        'PM2.5': [(0.0, 12.0, 0, 50), (12.1, 35.4, 51, 100), (35.5, 55.4, 101, 150), (55.5, 150.4, 151, 200), (150.5, 250.4, 201, 300), (250.5, 350.4, 301, 400), (350.5, 500.4, 401, 500)],
+        'PM10': [(0, 54, 0, 50), (55, 154, 51, 100), (155, 254, 101, 150), (255, 354, 151, 200), (355, 424, 201, 300), (425, 504, 301, 400), (505, 604, 401, 500)],
+        'CO': [(0.0, 4.4, 0, 50), (4.5, 9.4, 51, 100), (9.5, 12.4, 101, 150), (12.5, 15.4, 151, 200), (15.5, 30.4, 201, 300), (30.5, 40.4, 301, 400), (40.5, 50.4, 401, 500)],
+        'SO2': [(0, 35, 0, 50), (36, 75, 51, 100), (76, 185, 101, 150), (186, 304, 151, 200), (305, 604, 201, 300), (605, 804, 301, 400), (805, 1004, 401, 500)],
+        'NO2': [(0, 53, 0, 50), (54, 100, 51, 100), (101, 360, 101, 150), (361, 649, 151, 200), (650, 1249, 201, 300), (1250, 1649, 301, 400), (1650, 2049, 401, 500)],
+        'O3_1hr': [(0.125, 0.164, 101, 150), (0.165, 0.204, 151, 200), (0.205, 0.404, 201, 300), (0.405, 0.504, 301, 400), (0.505, 0.604, 401, 500)],
+        'O3_8hr': [(0.0, 0.054, 0, 50), (0.055, 0.07, 51, 100), (0.071, 0.085, 101, 150), (0.086, 0.105, 151, 200)]
+    }
+
+#Calculate AQI based on pollutation present in each row
+def calculate_row_aqi(row):
+    pollutant = row['pollutant']
+    concentration = row['value']
+    if pollutant in breakpoints:
+        return aqi_calculation(concentration, breakpoints[pollutant])
+    else:
+        return np.nan
+
+data['AQI'] = data.apply(calculate_row_aqi, axis=1)
+
+# Calculate overall AQI (max of all pollutant AQI values for the time period)
+daily_aqi = data.groupby('time')['AQI'].max().reset_index(name='MaxAQI')
+
 # Setup app and layout/frontend
 app = dash.Dash(
     __name__, title="Air Quality Tracker", external_stylesheets=['https://bootswatch.com/4/lux/bootstrap.css']
