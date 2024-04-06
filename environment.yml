@@ -1,19 +1,31 @@
-name: 'pollution-tracker'
+name: pollution-tracker
 channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.9
-  - pandas=2.2.1
   - altair=5.2.0
-  - vega_datasets=0.9.0
   - altair_data_server=0.4.1
-  - matplotlib=3.8.3
+  - dash=2.16.1
+  - flask=3.0.2
   - gunicorn==21.2
-  - pip
+  - ipykernel=6.29.3
+  - matplotlib=3.8.3
+  - numpy=1.26.4
+  - pandas=2.2.1
+  - pip=24.0
+  - python=3.9.19
+  - vega_datasets=0.9.0
   - pip:
-    - dash==2.16.1
-    - dash-leaflet==1.0.15
-    - dash-extensions==1.0.14
-    - dash_bootstrap_components==1.5.0
-    - plotly==5.20.0
+      - dash-bootstrap-components==1.5.0
+      - dash-core-components==2.0.0
+      - dash-extensions==1.0.14
+      - dash-html-components==2.0.0
+      - dash-leaflet==1.0.15
+      - dash-mantine-components==0.12.1
+      - dash-table==5.0.0
+      - dash-vega-components==0.9.0
+      - plotly==5.20.0
+      - pycountry==23.12.11
+      - pycountry-convert==0.7.2
+      - pytest==8.1.1
+prefix: /Users/meretelutz/miniconda3/envs/pollution-tracker
