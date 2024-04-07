@@ -8,11 +8,30 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 import dash_mantine_components as dmc
 from dash import dash_table
+import json
+import plotly.express as px
 
 
 # Read in data
 data = pd.read_csv("data/processed/world_air_quality.csv")
 data['time'] = pd.to_datetime(data['time']).dt.date
+
+correction_mapping = {
+    "Czech Republic": "Czechia",
+    "Russian Federation": "Russia",
+    "Macedonia, The former Yugoslav Rep. of": "North Macedonia",
+    "Taiwan, China": "Taiwan",
+    "United States": "United States of America",
+    "Lao People's Dem. Rep.": "Laos",
+    "Moldova, Republic of": "Moldova",
+    "Serbia": "Republic of Serbia",
+    "Hong Kong, China": "China",  # Assuming you want to map Hong Kong to China 
+    "West Bank and Gaza Strip": "Palestine",  # Assuming mapping to Palestine
+}
+data['countryname'] = data['countryname'].apply(lambda x: correction_mapping.get(x, x))
+countries_to_drop = ['Andorra', 'Gibraltar', 'Malta']
+filtered_data = data[~data['countryname'].isin(countries_to_drop)]
+data = filtered_data
 
 # Setup app and layout/frontend
 app = dash.Dash(
@@ -59,7 +78,7 @@ app.layout = html.Div([
         dbc.Col([
             # Main content column
             html.Label('Pollution Tracker'),
-            dcc.Graph(id='pollution_map', figure={}),  # Placeholder for the pollution map
+            dcc.Graph(id='graph'),  # Placeholder for the pollution map
             dbc.Row([
                 dbc.Col([
                     html.H3('Top 15 Countries of Pollutant'),
@@ -92,13 +111,29 @@ app.layout = html.Div([
 
 # Set up callbacks/backend
 @app.callback(
-    Output("world_map", "srcDoc"),
-    Input("pollutant", "value"),
-    Input("region", "value"),
-    Input("Country Label", "value"),
-    Input("year", "value"),
-)
-def plot_map():
+    Output("graph", "figure"), 
+    Input("pollutant_type_filter", "value"))
+def display_choropleth(selected_pollutant):
+    with open("data/raw/custom.geo.json", "r", encoding="utf-8") as f:
+        countries_geojson = json.load(f)
+        
+    df = data
+    filtered_data = data[data['pollutant'] == selected_pollutant]
+
+    aggregated_data = filtered_data.groupby('countryname')['value'].mean().reset_index()
+    
+    map = px.choropleth(
+        aggregated_data,
+        geojson=countries_geojson,
+        locations='countryname',          #aggregated data country label should exactly match name in featureidkey
+        color='value',       
+        featureidkey="properties.admin", #for country name
+        color_continuous_scale=px.colors.sequential.Plasma,  # Example color scale
+    )
+
+    map.update_layout(
+        margin={"r": 0, "t": 0, "l": 0, "b": 0})
+
     return map
 
 
@@ -201,6 +236,10 @@ def summary(pollutant, countries, time_range):
     ]
     summary = filtered_data.describe().reset_index()
     summary.rename(columns={'index': 'Statistic'}, inplace=True)
+
+    # Round numerical columns to two decimal places
+    for col in summary.select_dtypes(include=['float64']).columns:
+        summary[col] = summary[col].round(2)
 
     columns = [{"name": i, "id": i} for i in summary.columns]
     summary_data = summary.to_dict('records')
