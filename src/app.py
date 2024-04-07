@@ -1,6 +1,6 @@
 import dash
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import html
+from dash import dcc
 import dash_vega_components as dvc
 from dash.dependencies import Input, Output
 import altair as alt
@@ -11,11 +11,7 @@ from dash import dash_table
 
 
 # Read in data
-data = pd.read_csv("data/raw/world_air_quality.csv", delimiter=';')
-data = data.rename(columns={'Last Updated': 'time', 
-                     'Country Label': 'countryname',
-                     'Value': 'value',
-                     'Pollutant': 'pollutant'})
+data = pd.read_csv("data/processed/world_air_quality.csv")
 data['time'] = pd.to_datetime(data['time']).dt.date
 
 # Setup app and layout/frontend
@@ -30,27 +26,27 @@ app.layout = html.Div([
         dbc.Col([
             # Filters column
             html.Div([
-                html.Label('Select type of pollutant shown on the dashboard'),
+                html.Label('Select pollutant:'),
                 dcc.RadioItems(
                     id='pollutant_type_filter',
                     options=[{'label': i, 'value': i} for i in ['PM2.5', 'SO2', 'NO', 'CO', 'NOX', 'NO2', 'PM1', 'PM10']],
                     value='PM2.5',  
                     labelStyle={'display': 'inline-block', 'margin-right': '20px'}  
                 ),
-                html.Label('Select region(s)'),
+                html.Label('Select region(s):'),
                 dcc.Dropdown(
                     id='region_filter',
-                    options=[{"label": region, "value": region} for region in ['Africa', 'Antarctica', 'Asia', 'Europe', 'North America', 'Oceania', 'South America']],
+                    options=[{"label": region, "value": region} for region in data['continent'].unique()],
                     value=['Asia'],  # default selected value
                     multi=True
                 ),
-                html.Label('Select country'),
+                html.Label('Select country:'),
                 dcc.Dropdown(
                     id='country_filter',
-                    options=[{"label": country, "value": country} for country in data['countryname']],
+                    options=[{"label": country, "value": country} for country in data['countryname'].unique()],
                     value='Japan',  # default selected value
                 ),
-                html.Label('Select time period'),
+                html.Label('Select time period:'),
                 dmc.DateRangePicker(
                     id="date_range_picker",
                     minDate=min(data['time']),
