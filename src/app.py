@@ -16,90 +16,147 @@ import plotly.express as px
 data = pd.read_csv("data/processed/world_air_quality.csv")
 data['time'] = pd.to_datetime(data['time']).dt.date
 
-
 # Setup app and layout/frontend
 app = dash.Dash(
     __name__, title="Air Quality Tracker", external_stylesheets=['https://bootswatch.com/4/lux/bootstrap.css']
 )
 server = app.server
 
+# Filters
+pollutant_filter = html.Div([
+    html.Label('Select pollutant:'),
+    dcc.RadioItems(
+        id='pollutant_type_filter',
+        options=[{'label': i, 'value': i} for i in ['PM2.5', 'SO2', 'NO', 'CO', 'NOX', 'NO2', 'PM1', 'PM10']],
+        value='PM2.5',
+        labelStyle={'display': 'inline-block', 'margin-right': '20px'}
+    )
+], style={'textAlign': 'center'})
+
+region_filter = html.Div([
+    html.Label('Select region(s):'),
+    dcc.Dropdown(
+        id='region_filter',
+        options=[{"label": region, "value": region} for region in data['continent'].unique()],
+        value=['Asia'],  # default selected value
+        multi=True
+    )
+])
+
+time_period_picker_1 = html.Div([
+    html.Label('Select time period:'),
+    dmc.DateRangePicker(
+        id="time_period_picker_1",
+        minDate=min(data['time']),
+        maxDate=max(data['time']),
+        value=[min(data['time']), max(data['time'])],
+        style={"width": "100%"},
+    )
+])
+
+country_filter = html.Div([
+    html.Label('Select country:'),
+    dcc.Dropdown(
+        id='country_filter',
+        options=[{"label": country, "value": country} for country in data['countryname'].unique()],
+        value='Japan',  # default selected value
+    )
+])
+
+time_period_picker_2 = html.Div([
+    html.Label('Select time period:'),
+    dmc.DateRangePicker(
+        id="time_period_picker_2",
+        minDate=min(data['time']),
+        maxDate=max(data['time']),
+        value=[min(data['time']), max(data['time'])],
+        style={"width": "100%"},
+    )
+])
+
+graph_placeholder = html.Div([
+    html.Label('Worldwide Distribution'),
+    dcc.Graph(id='graph'),  # Placeholder for the pollution map
+])
+
+top_countries_chart = html.Div([
+    html.H3('Top 15 Countries of Pollutant'),
+    dvc.Vega(id='top_countries_chart', spec={}, style={'width': '100%', 'height': '100%'})
+])
+
+data_summary = html.Div([
+    html.H3('Data Summary'),
+    dash_table.DataTable(
+        id='data-summary-table',
+        style_cell={'textAlign': 'center'},
+        style_header={
+            'backgroundColor': 'white',
+            'fontWeight': 'bold'
+        },
+    )
+], style={'width': '100%'})
+
+trend_chart = html.Div([
+    html.H3('Trend of Pollutant over time'),
+    dvc.Vega(id='trend_chart', spec={}, style={'width': '100%', 'height': '100%'})
+])
+
+# Layout
 app.layout = html.Div([
-    dbc.Row(html.H1('Pollutant Tracker')),
+    dbc.Row(html.H1('Pollutant Tracker'), justify="center"),
+    dbc.Row(pollutant_filter, justify="center"),
+    html.Hr(),
+    # First card with header: Region, Time Period Picker for Region, Graph, and Top Countries Chart
+    dbc.Card(
+        [
+            dbc.CardHeader("Worldwide Comparison", className="font-weight-bold"),  # Card header with title
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Col(region_filter, width=3),
+                    dbc.Col(time_period_picker_1, width=3),
+                ], justify="start"),
+                html.Hr(), 
+                dbc.Row([
+                    dbc.Col(graph_placeholder, width=8),
+                    dbc.Col(top_countries_chart, width=4),
+                ], justify="around"),
+            ]),
+        ],
+        className="mb-3", 
+    ),
+    # Second card with header: Country Filter, Time Period Picker for Country, Data Summary, and Trend Chart
+    dbc.Card(
+        [
+            dbc.CardHeader("Country of Interest Trend", className="font-weight-bold"),  # Card header with title
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Col(country_filter, width=3),
+                    dbc.Col(time_period_picker_2, width=3),
+                ], justify="start"),
+                html.Hr(),  
+                dbc.Row([
+                    dbc.Col(trend_chart, width=4),
+                    dbc.Col(data_summary, width=4),
+                ], justify="around"),
+            ]),
+        ],
+        className="mb-3",
+    ),
     dbc.Row([
         dbc.Col([
-            # Filters column
             html.Div([
-                html.Label('Select pollutant:'),
-                dcc.RadioItems(
-                    id='pollutant_type_filter',
-                    options=[{'label': i, 'value': i} for i in ['PM2.5', 'SO2', 'NO', 'CO', 'NOX', 'NO2', 'PM1', 'PM10']],
-                    value='PM2.5',  
-                    labelStyle={'display': 'inline-block', 'margin-right': '20px'}  
-                ),
-                html.Label('Select region(s):'),
-                dcc.Dropdown(
-                    id='region_filter',
-                    options=[{"label": region, "value": region} for region in data['continent'].unique()],
-                    value=['Asia'],  # default selected value
-                    multi=True
-                ),
-                html.Label('Select country:'),
-                dcc.Dropdown(
-                    id='country_filter',
-                    options=[{"label": country, "value": country} for country in data['countryname'].unique()],
-                    value='Japan',  # default selected value
-                ),
-                html.Label('Select time period:'),
-                dmc.DateRangePicker(
-                    id="date_range_picker",
-                    minDate=min(data['time']),
-                    maxDate=max(data['time']),
-                    value=[min(data['time']), max(data['time'])],
-                    style={"width": "100%"},
-                ),
-            ], style={'margin-right': '20px'}),
-            html.Div([
-                html.P(" ",
-                    style={"font-size": "16px"}),
+                html.P(" ", style={"font-size": "16px"}),
                 html.P("This dashboard visualizes global air pollution levels, making it easy to explore global and local trends",
-                    style={"font-size": "16px"}),
+                       style={"font-size": "16px"}),
                 html.P("Creators: Merete Lutz, Kun Ya, Weiran Zhao, Sid Grover",
-                    style={"font-size": "12px"}),
+                       style={"font-size": "12px"}),
                 html.A("GitHub Repository", href="https://github.com/UBC-MDS/DSCI-532_2024_2_pollution-tracker",
-                    target="_blank", style={"font-size": "12px"}),
+                       target="_blank", style={"font-size": "12px"}),
                 html.P("Last updated on April 7, 2024",
-                    style={"font-size": "12px"})
-            ]),  # Filters column width
-        ], width=3),  # Filters column width
-        dbc.Col([
-            # Main content column
-            html.Label('Pollution Tracker'),
-            dcc.Graph(id='graph'),  # Placeholder for the pollution map
-            dbc.Row([
-                dbc.Col([
-                    html.H3('Top 15 Countries of Pollutant'),
-                    dvc.Vega(id='top_countries_chart', spec={}, style={'width': '100%', 'height': '100%'})
-                ], md=4),
-                dbc.Col([
-                    html.H3('Trend of Pollutant over time'),
-                    dvc.Vega(id='trend_chart', spec={}, style={'width': '100%', 'height': '100%'})
-                ], md=5),
-                dbc.Col(
-                    html.Div([
-                        html.H3('Data Summary'),
-                        dash_table.DataTable(
-                            id='data-summary-table',
-                            style_cell={'textAlign': 'center'},
-                            style_header={
-                                'backgroundColor': 'white',
-                                'fontWeight': 'bold'
-                            },
-                        )
-                    ], style={'width': '80%'}),
-                md=3),
-            ]),
-        ], width=9)  # Main content column width
-    ])
+                       style={"font-size": "12px"}),
+            ])
+        ], width=12),
+    ]),
 ])
 
 
@@ -109,6 +166,7 @@ app.layout = html.Div([
 @app.callback(
     Output("graph", "figure"), 
     Input("pollutant_type_filter", "value"))
+
 def display_choropleth(selected_pollutant):
     with open("data/raw/custom.geo.json", "r", encoding="utf-8") as f:
         countries_geojson = json.load(f)
@@ -136,9 +194,7 @@ def display_choropleth(selected_pollutant):
 @app.callback(
     Output("top_countries_chart", "spec"),
     Input("pollutant_type_filter", "value"),
-    #Input("region_filter", "value"),
-    #Input("country_filter", "value"),
-    Input("date_range_picker", "value"),
+    Input("time_period_picker_1", "value"),  # Updated to use time_period_picker_1
 )
 def plot_bar(pollutant, time_range):
     start_date, end_date = time_range
@@ -173,10 +229,10 @@ def plot_bar(pollutant, time_range):
 @app.callback(
     Output("trend_chart", "spec"),
     Input("pollutant_type_filter", "value"),
-    #Input("region_filter", "value"),
     Input("country_filter", "value"),
-    Input("date_range_picker", "value"),
+    Input("time_period_picker_2", "value"),  # Updated to use time_period_picker_2
 )
+
 def plot_line(pollutant, countries, time_range):
     start_date, end_date = time_range
     start_date = pd.to_datetime(start_date).date()
@@ -212,10 +268,10 @@ def plot_line(pollutant, countries, time_range):
     Output('data-summary-table', 'columns'),
     Output('data-summary-table', 'data'),
     Input("pollutant_type_filter", "value"),
-    #Input("region_filter", "value"),
     Input("country_filter", "value"),
-    Input("date_range_picker", "value"),
+    Input("time_period_picker_2", "value"),  # Updated to use time_period_picker_2
 )
+
 def summary(pollutant, countries, time_range):
     start_date, end_date = time_range
     start_date = pd.to_datetime(start_date).date()
