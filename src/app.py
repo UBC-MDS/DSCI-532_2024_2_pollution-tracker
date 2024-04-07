@@ -17,7 +17,6 @@ data = pd.read_csv("data/processed/world_air_quality.csv")
 data['time'] = pd.to_datetime(data['time']).dt.date
 
 
-
 # Setup app and layout/frontend
 app = dash.Dash(
     __name__, title="Air Quality Tracker", external_stylesheets=['https://bootswatch.com/4/lux/bootstrap.css']
@@ -57,8 +56,20 @@ app.layout = html.Div([
                     maxDate=max(data['time']),
                     value=[min(data['time']), max(data['time'])],
                     style={"width": "100%"},
-                )
-            ], style={'margin-right': '20px'})
+                ),
+            ], style={'margin-right': '20px'}),
+            html.Div([
+                html.P(" ",
+                    style={"font-size": "16px"}),
+                html.P("This dashboard visualizes global air pollution levels, making it easy to explore global and local trends",
+                    style={"font-size": "16px"}),
+                html.P("Creators: Merete Lutz, Kun Ya, Weiran Zhao, Sid Grover",
+                    style={"font-size": "12px"}),
+                html.A("GitHub Repository", href="https://github.com/UBC-MDS/DSCI-532_2024_2_pollution-tracker",
+                    target="_blank", style={"font-size": "12px"}),
+                html.P("Last updated on April 7, 2024",
+                    style={"font-size": "12px"})
+            ]),  # Filters column width
         ], width=3),  # Filters column width
         dbc.Col([
             # Main content column
