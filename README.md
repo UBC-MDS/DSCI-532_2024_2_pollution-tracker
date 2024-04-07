@@ -2,7 +2,7 @@
 
 ## A dashboard to explore local and global trends in air pollutions
 
-![gif](../img/app.gif)
+![gif](./img/app.gif)
 
 Welcome to our repository! Feel free to look around. If you want to go straight to the dashboard, click [here](https://dsci-532-2024-2-pollution-tracker.onrender.com/). Read on to find out more about what we're doing and why.
 
