@@ -16,22 +16,7 @@ import plotly.express as px
 data = pd.read_csv("data/processed/world_air_quality.csv")
 data['time'] = pd.to_datetime(data['time']).dt.date
 
-correction_mapping = {
-    "Czech Republic": "Czechia",
-    "Russian Federation": "Russia",
-    "Macedonia, The former Yugoslav Rep. of": "North Macedonia",
-    "Taiwan, China": "Taiwan",
-    "United States": "United States of America",
-    "Lao People's Dem. Rep.": "Laos",
-    "Moldova, Republic of": "Moldova",
-    "Serbia": "Republic of Serbia",
-    "Hong Kong, China": "China",  # Assuming you want to map Hong Kong to China 
-    "West Bank and Gaza Strip": "Palestine",  # Assuming mapping to Palestine
-}
-data['countryname'] = data['countryname'].apply(lambda x: correction_mapping.get(x, x))
-countries_to_drop = ['Andorra', 'Gibraltar', 'Malta']
-filtered_data = data[~data['countryname'].isin(countries_to_drop)]
-data = filtered_data
+
 
 # Setup app and layout/frontend
 app = dash.Dash(
