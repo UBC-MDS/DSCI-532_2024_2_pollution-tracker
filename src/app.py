@@ -194,19 +194,20 @@ def display_choropleth(selected_pollutant):
 @app.callback(
     Output("top_countries_chart", "spec"),
     Input("pollutant_type_filter", "value"),
-    Input("time_period_picker_1", "value"),  # Updated to use time_period_picker_1
+    Input("time_period_picker_1", "value"),  
+    Input("region_filter", "value")
 )
-def plot_bar(pollutant, time_range):
+def plot_bar(pollutant, time_range, regions):
     start_date, end_date = time_range
     start_date = pd.to_datetime(start_date).date()
     end_date = pd.to_datetime(end_date).date()
-    #if not isinstance(countries, list):
-    #    countries = [countries]
+    if not isinstance(regions, list):
+        regions = [regions]
 
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
-        #(pollutant['region'].isin(regions)) &
+        (data['continent'].isin(regions)) &
     #    (data['countryname'].isin(countries)) &
         (data['pollutant'] == pollutant)
     ]
