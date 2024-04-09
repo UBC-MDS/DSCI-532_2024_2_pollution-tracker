@@ -38,8 +38,9 @@ region_filter = html.Div([
     dcc.Dropdown(
         id='region_filter',
         options=[{"label": region, "value": region} for region in data['continent'].unique()],
-        value=['Asia'],  # default selected value
-        multi=True
+        #value=['Asia'],  # default selected value
+        multi=True,
+        placeholder='Select multiple continents...'
     )
 ])
 
@@ -165,14 +166,19 @@ app.layout = html.Div([
 # Set up callbacks/backend
 @app.callback(
     Output("graph", "figure"), 
-    Input("pollutant_type_filter", "value"))
+    Input("pollutant_type_filter", "value"),
+    Input("region_filter", "value")
+)
 
-def display_choropleth(selected_pollutant):
+def display_choropleth(selected_pollutant, regions):
     with open("data/raw/custom.geo.json", "r", encoding="utf-8") as f:
         countries_geojson = json.load(f)
-        
+    
     df = data
     filtered_data = data[data['pollutant'] == selected_pollutant]
+
+    if regions:
+        filtered_data = filtered_data[filtered_data['continent'].isin(regions)]
 
     aggregated_data = filtered_data.groupby('countryname')['value'].mean().reset_index()
     
@@ -201,17 +207,16 @@ def plot_bar(pollutant, time_range, regions):
     start_date, end_date = time_range
     start_date = pd.to_datetime(start_date).date()
     end_date = pd.to_datetime(end_date).date()
-    if not isinstance(regions, list):
-        regions = [regions]
 
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
-        (data['continent'].isin(regions)) &
-    #    (data['countryname'].isin(countries)) &
         (data['pollutant'] == pollutant)
     ]
+    if regions:
+        filtered_data = filtered_data[data['continent'].isin(regions)]
     top_countries_data = filtered_data.groupby('countryname', as_index=False)['value'].mean().sort_values(by='value', ascending=False).head(15)
+
     bar = alt.Chart(top_countries_data).mark_bar(fill='black').encode(
         x=alt.X('value:Q', title='Average AQI Value'),
         y=alt.Y('countryname:N',  title='Country').sort('-x'),
@@ -238,13 +243,10 @@ def plot_line(pollutant, countries, time_range):
     start_date, end_date = time_range
     start_date = pd.to_datetime(start_date).date()
     end_date = pd.to_datetime(end_date).date()
-    #if not isinstance(countries, list):
-    #    countries = [countries]
     
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
-        #(pollutant['region'].isin(regions)) &
         (data['countryname']== countries) &
         (data['pollutant'] == pollutant)
     ]
@@ -277,13 +279,10 @@ def summary(pollutant, countries, time_range):
     start_date, end_date = time_range
     start_date = pd.to_datetime(start_date).date()
     end_date = pd.to_datetime(end_date).date()
-    #if not isinstance(countries, list):
-    #    countries = [countries]
     
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
-        #(pollutant['region'].isin(regions)) &
         (data['countryname'] == countries) &
         (data['pollutant'] == pollutant)
     ]
