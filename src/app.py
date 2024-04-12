@@ -306,9 +306,12 @@ def summary(pollutant, countries, time_range):
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
-        (data['countryname'] == countries) &
+        #(data['countryname'].isin(countries)) &
         (data['pollutant'] == pollutant)
     ]
+    if countries:
+        filtered_data = filtered_data[data['countryname'].isin(countries)]
+        
     summary = filtered_data.describe().reset_index()
     summary.rename(columns={'index': 'Statistic'}, inplace=True)
 
