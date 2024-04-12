@@ -200,20 +200,22 @@ def display_choropleth(selected_pollutant, regions):
     )
 
     if regions and len(regions) == 0:
-        center = None 
+        center = None
+        projection_scale = 1
     elif regions and len(regions) == 1: 
         center = region_centers.get(regions[0], {'lat': 0, 'lon': 0})
+        projection_scale = 4
     else:
         center = {'lat': 0, 'lon': 0}
-
+        projection_scale = 1
+            
     map.update_layout(
         geo=dict(
             center = center,
-            projection_scale = 2
+            projection_scale = projection_scale
         ),
         margin={"r": 0, "t": 0, "l": 0, "b": 0}
     )
-
     return map
 
 
