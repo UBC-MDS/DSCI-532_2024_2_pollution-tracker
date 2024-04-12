@@ -199,8 +199,20 @@ def display_choropleth(selected_pollutant, regions):
         color_continuous_scale=px.colors.sequential.Plasma,  # Example color scale
     )
 
+    if regions and len(regions) == 0:
+        center = None 
+    elif regions and len(regions) == 1: 
+        center = region_centers.get(regions[0], {'lat': 0, 'lon': 0})
+    else:
+        center = {'lat': 0, 'lon': 0}
+
     map.update_layout(
-        margin={"r": 0, "t": 0, "l": 0, "b": 0})
+        geo=dict(
+            center = center,
+            projection_scale = 2
+        ),
+        margin={"r": 0, "t": 0, "l": 0, "b": 0}
+    )
 
     return map
 
