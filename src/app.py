@@ -212,6 +212,7 @@ def display_choropleth(selected_pollutant, regions):
     map.update_layout(
         geo=dict(
             center = center,
+            projection_type = 'natural earth',
             projection_scale = projection_scale
         ),
         margin={"r": 0, "t": 0, "l": 0, "b": 0}
