@@ -250,22 +250,40 @@ def plot_line(pollutant, countries, time_range):
         (data['countryname']== countries) &
         (data['pollutant'] == pollutant)
     ]
+    
     filtered_data['time'] = filtered_data['time'].astype(str)
-    line = alt.Chart(filtered_data).mark_line(color='black').encode(
-        x=alt.X('time:T', axis=alt.Axis(title='Date', format='%Y-%m')), 
-        y=alt.Y('value:Q', axis=alt.Axis(title='Value')),  
-        #color=alt.Color('countryname:N', legend=alt.Legend(title='Country')),
-        tooltip=[
-        alt.Tooltip('time:T', title='Date', format='%Y-%m-%d'),
-        alt.Tooltip('value:Q', title='AQI value'),
-        alt.Tooltip('countryname:N', title='Country')
-        ]
+    
+    circles = alt.Chart(filtered_data).mark_circle(
+        opacity=0.5
+        ).encode(
+            x=alt.X('time:T', axis=alt.Axis(title='Date', format='%Y-%m')), 
+            y=alt.Y('AQI:Q', axis=alt.Axis(title='Value')),  
+            color=alt.Color('countryname:N', legend=alt.Legend(title='Country')),
+            tooltip=[
+            alt.Tooltip('time:T', title='Date', format='%Y-%m-%d'),
+            alt.Tooltip('AQI:Q', title='AQI value'),
+            alt.Tooltip('countryname:N', title='Country')
+            ]
         ).properties(
             title='Air Quality Index (AQI) Over Time',
-            width=400,
+            width=500,
             height=300
-        ).to_dict()
-    return line
+        )
+    
+    line = alt.Chart(filtered_data).mark_line(
+            size = 3
+        ).transform_window(
+            rolling_mean='mean(AQI)',
+            frame=[-12, 12]
+        ).encode(
+            x=alt.X('time:T', axis=alt.Axis(title='Date', format='%Y-%m')), 
+            y=alt.Y('rolling_mean:Q', axis=alt.Axis(title='Value')),  
+            color=alt.Color('countryname:N', legend=alt.Legend(title='Country'))
+        )
+
+    circles_line = circles + line
+
+    return circles_line.to_dict()
 
 @app.callback(
     Output('data-summary-table', 'columns'),
