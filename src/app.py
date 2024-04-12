@@ -15,6 +15,7 @@ import plotly.express as px
 
 # Read in data
 data = pd.read_csv("data/processed/world_air_quality.csv")
+data['time_hour'] = pd.to_datetime(data['time_hour']).dt.tz_convert(None)
 data['time'] = pd.to_datetime(data['time']).dt.date
 
 # Setup app and layout/frontend
@@ -353,12 +354,12 @@ def plot_line(pollutant, countries, start_year, start_month, end_year, end_month
     circles = alt.Chart(filtered_data).mark_circle(
         opacity=0.5
         ).encode(
-            x=alt.X('time:T', axis=alt.Axis(title='Date', format='%Y-%m')), 
-            y=alt.Y('AQI:Q', axis=alt.Axis(title='Value')),  
+            x=alt.X('time_hour:T', axis=alt.Axis(title='Date', format='%Y-%m')), 
+            y=alt.Y('AQI:Q', axis=alt.Axis(title='AQI Value')),  
             color=alt.Color('countryname:N', legend=alt.Legend(title='Country')),
             tooltip=[
-            alt.Tooltip('time:T', title='Date', format='%Y-%m-%d'),
-            alt.Tooltip('AQI:Q', title='AQI value'),
+            alt.Tooltip('time_hour:T', title='Date', format='%Y-%m-%d'),
+            alt.Tooltip('AQI:Q', title='AQI Value'),
             alt.Tooltip('countryname:N', title='Country')
             ]
         ).properties(
@@ -371,7 +372,7 @@ def plot_line(pollutant, countries, start_year, start_month, end_year, end_month
             size = 3
         ).transform_window(
             rolling_mean='mean(AQI)',
-            frame=[-12, 12]
+            frame=[-84, 84]
         ).encode(
             x=alt.X('time:T'), 
             y=alt.Y('rolling_mean:Q'),  
