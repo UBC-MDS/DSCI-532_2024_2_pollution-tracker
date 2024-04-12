@@ -241,6 +241,15 @@ app.layout = html.Div([
 )
 
 def display_choropleth(selected_pollutant, regions, start_year, start_month, end_year, end_month):
+    region_centers = {
+    'Asia': {'lat': 34.0479, 'lon': 100.6197},
+    'Europe': {'lat': 54.5260, 'lon': 15.2551},
+    'Africa': {'lat': -8.7832, 'lon': 34.5085},
+    'North America': {'lat': 54.5260, 'lon': -105.2551},
+    'South America': {'lat': -8.7832, 'lon': -55.4915},
+    'Australia': {'lat': -25.2744, 'lon': 133.7751}
+}
+
     start_date_str = f"{start_year}-{start_month:02d}"
     end_date_str = f"{end_year}-{end_month:02d}"
     start_date = pd.to_datetime(start_date_str).date()
@@ -270,9 +279,24 @@ def display_choropleth(selected_pollutant, regions, start_year, start_month, end
         color_continuous_scale=px.colors.sequential.Plasma,  # Example color scale
     )
 
+    if regions and len(regions) == 0:
+        center = None
+        projection_scale = 1
+    elif regions and len(regions) == 1: 
+        center = region_centers.get(regions[0], {'lat': 0, 'lon': 0})
+        projection_scale = 1.5
+    else:
+        center = {'lat': 0, 'lon': 0}
+        projection_scale = 1
+            
     map.update_layout(
-        margin={"r": 0, "t": 0, "l": 0, "b": 0})
-
+        geo=dict(
+            center = center,
+            projection_type = 'natural earth',
+            projection_scale = projection_scale
+        ),
+        margin={"r": 0, "t": 0, "l": 0, "b": 0}
+    )
     return map
 
 
