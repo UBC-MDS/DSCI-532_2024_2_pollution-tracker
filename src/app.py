@@ -44,36 +44,41 @@ region_filter = html.Div([
     )
 ])
 
-time_period_picker_1 = html.Div([
-    html.Label('Select time period:'),
-    dmc.DateRangePicker(
-        id="time_period_picker_1",
-        minDate=min(data['time']),
-        maxDate=max(data['time']),
-        value=[min(data['time']), max(data['time'])],
-        style={"width": "100%"},
-    )
-])
+years = list(range(2014, 2025))
+month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+start_year_dropdown = dcc.Dropdown(
+    id='start_year',
+    options=[{'label': year, 'value': year} for year in years],
+    value=years[0]
+)
+
+start_month_dropdown = dcc.Dropdown(
+    id='start_month',
+    options=[{'label': month, 'value': i+1} for i, month in enumerate(month_names)],
+    value=1
+)
+
+end_year_dropdown = dcc.Dropdown(
+    id='end_year',
+    options=[{'label': year, 'value': year} for year in years],
+    value=years[-1]
+)
+
+end_month_dropdown = dcc.Dropdown(
+    id='end_month',
+    options=[{'label': month, 'value': i+1} for i, month in enumerate(month_names)],
+    value=12
+)
 
 country_filter = html.Div([
     html.Label('Select country:'),
     dcc.Dropdown(
         id='country_filter',
         options=[{"label": country, "value": country} for country in data['countryname'].unique()],
-        value='Japan',  # default selected value
     )
 ])
 
-time_period_picker_2 = html.Div([
-    html.Label('Select time period:'),
-    dmc.DateRangePicker(
-        id="time_period_picker_2",
-        minDate=min(data['time']),
-        maxDate=max(data['time']),
-        value=[min(data['time']), max(data['time'])],
-        style={"width": "100%"},
-    )
-])
 
 graph_placeholder = html.Div([
     html.Label('Worldwide Distribution'),
@@ -106,6 +111,28 @@ trend_chart = html.Div([
 app.layout = html.Div([
     dbc.Row(html.H1('Pollutant Tracker'), justify="center"),
     dbc.Row(pollutant_filter, justify="center"),
+    dbc.Row([
+        dbc.Col(width=1.3), 
+        dbc.Col(html.Div([
+            html.Label('Start Year:'),
+            start_year_dropdown
+        ]), width=2), 
+        dbc.Col(html.Div([
+            html.Label('Start Month:'),
+            start_month_dropdown
+        ]), width=2),
+        dbc.Col(width=0.7),
+        dbc.Col(html.Div(className='text-center', style={'borderLeft': '1px solid #ccc', 'height': '50px'}), width=0.7),
+        dbc.Col(html.Div([
+            html.Label('End Year:'),
+            end_year_dropdown
+        ]), width=2),  
+        dbc.Col(html.Div([
+            html.Label('End Month:'),
+            end_month_dropdown
+        ]), width=2),
+        dbc.Col(width=1.3),
+    ], justify="center"),
     html.Hr(),
     # First card with header: Region, Time Period Picker for Region, Graph, and Top Countries Chart
     dbc.Card(
@@ -113,13 +140,12 @@ app.layout = html.Div([
             dbc.CardHeader("Worldwide Comparison", className="font-weight-bold"),  # Card header with title
             dbc.CardBody([
                 dbc.Row([
-                    dbc.Col(region_filter, width=3),
-                    dbc.Col(time_period_picker_1, width=3),
+                    dbc.Col(region_filter, width=3)
                 ], justify="start"),
                 html.Hr(), 
                 dbc.Row([
                     dbc.Col(graph_placeholder, width=8),
-                    dbc.Col(top_countries_chart, width=4),
+                    dbc.Col(top_countries_chart, width=4)
                 ], justify="around"),
             ]),
         ],
@@ -132,7 +158,6 @@ app.layout = html.Div([
             dbc.CardBody([
                 dbc.Row([
                     dbc.Col(country_filter, width=3),
-                    dbc.Col(time_period_picker_2, width=3),
                 ], justify="start"),
                 html.Hr(),  
                 dbc.Row([
@@ -158,24 +183,97 @@ app.layout = html.Div([
             ])
         ], width=12),
     ]),
+    html.Div(id='first_country_name', style={'display': 'none'})
 ])
 
+@app.callback(
+    Output('country_filter', 'options'),
+[
+    Input('pollutant_type_filter', 'value'),
+    Input("start_year", "value"),
+    Input("start_month", "value"),
+    Input("end_year", "value"),
+    Input("end_month", "value"),
+    Input("region_filter", "value"),
+    ]
+)
+def update_country_options(selected_pollutant, start_year, start_month, end_year, end_month, regions):
+    start_date_str = f"{start_year}-{start_month:02d}"
+    end_date_str = f"{end_year}-{end_month:02d}"
+    start_date = pd.to_datetime(start_date_str).date()
+    end_date = pd.to_datetime(end_date_str).date()
+
+    filtered_data = data[
+        (data['pollutant'] == selected_pollutant) &
+        (data['time'] >= start_date) &
+        (data['time'] <= end_date)
+    ]
+
+    if regions:
+        filtered_data = filtered_data[filtered_data['continent'].isin(regions)]
+
+    unique_countries = filtered_data['countryname'].unique()
+    return [{'label': country, 'value': country} for country in unique_countries]
+
+@app.callback(
+    Output('region_filter', 'options'),
+[
+    Input('pollutant_type_filter', 'value'),
+    Input("start_year", "value"),
+    Input("start_month", "value"),
+    Input("end_year", "value"),
+    Input("end_month", "value"),
+    ]
+)
+def update_region_options(selected_pollutant, start_year, start_month, end_year, end_month):
+    start_date_str = f"{start_year}-{start_month:02d}"
+    end_date_str = f"{end_year}-{end_month:02d}"
+    start_date = pd.to_datetime(start_date_str).date()
+    end_date = pd.to_datetime(end_date_str).date()
+
+    filtered_data = data[
+        (data['pollutant'] == selected_pollutant) &
+        (data['time'] >= start_date) &
+        (data['time'] <= end_date)
+    ]
+
+    unique_continent = filtered_data['continent'].unique()
+    return [{'label': continent, 'value': continent} for continent in unique_continent]
 
 
+@app.callback(
+    Output('country_filter', 'value'),
+    [Input('first_country_name', 'children')]
+)
+def set_country_filter_default(first_country):
+    return first_country
 
 # Set up callbacks/backend
 @app.callback(
     Output("graph", "figure"), 
     Input("pollutant_type_filter", "value"),
-    Input("region_filter", "value")
+    Input("region_filter", "value"),
+    Input("start_year", "value"),
+    Input("start_month", "value"),
+    Input("end_year", "value"),
+    Input("end_month", "value"),
 )
 
-def display_choropleth(selected_pollutant, regions):
+def display_choropleth(selected_pollutant, regions, start_year, start_month, end_year, end_month):
+    start_date_str = f"{start_year}-{start_month:02d}"
+    end_date_str = f"{end_year}-{end_month:02d}"
+    start_date = pd.to_datetime(start_date_str).date()
+    end_date = pd.to_datetime(end_date_str).date()
+
     with open("data/raw/custom.geo.json", "r", encoding="utf-8") as f:
         countries_geojson = json.load(f)
     
     df = data
-    filtered_data = data[data['pollutant'] == selected_pollutant]
+    filtered_data = data[
+        (data['pollutant'] == selected_pollutant) &
+        (data['time'] >= start_date) &
+        (data['time'] <= end_date)
+    ]
 
     if regions:
         filtered_data = filtered_data[filtered_data['continent'].isin(regions)]
@@ -199,50 +297,69 @@ def display_choropleth(selected_pollutant, regions):
 
 @app.callback(
     Output("top_countries_chart", "spec"),
-    Input("pollutant_type_filter", "value"),
-    Input("time_period_picker_1", "value"),  
-    Input("region_filter", "value")
+    Output("first_country_name", "children"),
+    [
+        Input("pollutant_type_filter", "value"),
+        Input("start_year", "value"),
+        Input("start_month", "value"),
+        Input("end_year", "value"),
+        Input("end_month", "value"),
+        Input("region_filter", "value")
+    ]
 )
-def plot_bar(pollutant, time_range, regions):
-    start_date, end_date = time_range
-    start_date = pd.to_datetime(start_date).date()
-    end_date = pd.to_datetime(end_date).date()
+def plot_bar(pollutant, start_year, start_month, end_year, end_month, regions):
+    start_date_str = f"{start_year}-{start_month:02d}"
+    end_date_str = f"{end_year}-{end_month:02d}"
+    start_date = pd.to_datetime(start_date_str).date()
+    end_date = pd.to_datetime(end_date_str).date()
 
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
         (data['pollutant'] == pollutant)
     ]
+
     if regions:
-        filtered_data = filtered_data[data['continent'].isin(regions)]
+        filtered_data = filtered_data[filtered_data['continent'].isin(regions)]
+
     top_countries_data = filtered_data.groupby('countryname', as_index=False)['value'].mean().sort_values(by='value', ascending=False).head(15)
 
     bar = alt.Chart(top_countries_data).mark_bar(fill='black').encode(
         x=alt.X('value:Q', title='Average AQI Value'),
-        y=alt.Y('countryname:N',  title='Country').sort('-x'),
+        y=alt.Y('countryname:N', title='Country', sort='-x'),
         tooltip=[
-        alt.Tooltip('countryname:N', title='Country'),
-        alt.Tooltip('value:Q', title='AQI value')
+            alt.Tooltip('countryname:N', title='Country'),
+            alt.Tooltip('value:Q', title='AQI value')
         ]
     ).properties(
         title='Top 15 Countries by AQI Value',
         width=250,
         height=300
     ).to_dict()
-    return bar
+
+    if not top_countries_data.empty:
+        first_country = top_countries_data.iloc[0]['countryname']
+    else:
+        first_country = None
+    
+    return bar, first_country
 
 
 @app.callback(
     Output("trend_chart", "spec"),
     Input("pollutant_type_filter", "value"),
     Input("country_filter", "value"),
-    Input("time_period_picker_2", "value"),  # Updated to use time_period_picker_2
+    Input("start_year", "value"),
+    Input("start_month", "value"),
+    Input("end_year", "value"),
+    Input("end_month", "value"),
 )
 
-def plot_line(pollutant, countries, time_range):
-    start_date, end_date = time_range
-    start_date = pd.to_datetime(start_date).date()
-    end_date = pd.to_datetime(end_date).date()
+def plot_line(pollutant, countries, start_year, start_month, end_year, end_month):
+    start_date_str = f"{start_year}-{start_month:02d}"
+    end_date_str = f"{end_year}-{end_month:02d}"
+    start_date = pd.to_datetime(start_date_str).date()
+    end_date = pd.to_datetime(end_date_str).date()
     
     filtered_data = data[
         (data['time'] >= start_date) &
@@ -272,13 +389,17 @@ def plot_line(pollutant, countries, time_range):
     Output('data-summary-table', 'data'),
     Input("pollutant_type_filter", "value"),
     Input("country_filter", "value"),
-    Input("time_period_picker_2", "value"),  # Updated to use time_period_picker_2
+    Input("start_year", "value"),
+    Input("start_month", "value"),
+    Input("end_year", "value"),
+    Input("end_month", "value"),
 )
 
-def summary(pollutant, countries, time_range):
-    start_date, end_date = time_range
-    start_date = pd.to_datetime(start_date).date()
-    end_date = pd.to_datetime(end_date).date()
+def summary(pollutant, countries, start_year, start_month, end_year, end_month):
+    start_date_str = f"{start_year}-{start_month:02d}"
+    end_date_str = f"{end_year}-{end_month:02d}"
+    start_date = pd.to_datetime(start_date_str).date()
+    end_date = pd.to_datetime(end_date_str).date()
     
     filtered_data = data[
         (data['time'] >= start_date) &
