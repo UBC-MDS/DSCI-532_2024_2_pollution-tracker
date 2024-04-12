@@ -5,3 +5,4 @@ dash-vega-components==0.9.*
 altair==5.3.*
 pandas==2.2.*
 dash_mantine_components==0.12.*
+vl-convert-python==1.3.*
