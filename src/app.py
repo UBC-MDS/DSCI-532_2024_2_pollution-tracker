@@ -171,6 +171,14 @@ app.layout = html.Div([
 )
 
 def display_choropleth(selected_pollutant, regions):
+    region_centers = {
+    'Asia': {'lat': 34.0479, 'lon': 100.6197},
+    'Europe': {'lat': 54.5260, 'lon': 15.2551},
+    'Africa': {'lat': -8.7832, 'lon': 34.5085},
+    'North America': {'lat': 54.5260, 'lon': -105.2551},
+    'South America': {'lat': -8.7832, 'lon': -55.4915},
+    'Australia': {'lat': -25.2744, 'lon': 133.7751}
+}
     with open("data/raw/custom.geo.json", "r", encoding="utf-8") as f:
         countries_geojson = json.load(f)
     
