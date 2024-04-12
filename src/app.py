@@ -204,7 +204,7 @@ def display_choropleth(selected_pollutant, regions):
         projection_scale = 1
     elif regions and len(regions) == 1: 
         center = region_centers.get(regions[0], {'lat': 0, 'lon': 0})
-        projection_scale = 2
+        projection_scale = 1.5
     else:
         center = {'lat': 0, 'lon': 0}
         projection_scale = 1
