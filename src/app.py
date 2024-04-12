@@ -4,6 +4,7 @@ from dash import dcc
 import dash_vega_components as dvc
 from dash.dependencies import Input, Output
 import altair as alt
+alt.data_transformers.enable("vegafusion")
 import dash_bootstrap_components as dbc
 import pandas as pd
 import dash_mantine_components as dmc
@@ -56,11 +57,13 @@ time_period_picker_1 = html.Div([
 ])
 
 country_filter = html.Div([
-    html.Label('Select country:'),
+    html.Label('Select countries:'),
     dcc.Dropdown(
         id='country_filter',
         options=[{"label": country, "value": country} for country in data['countryname'].unique()],
-        value='Japan',  # default selected value
+        value=['China', 'India', 'United States of America'],  # default selected value
+        multi=True,
+        placeholder='Select multiple countries...'
     )
 ])
 
@@ -228,7 +231,7 @@ def plot_bar(pollutant, time_range, regions):
         title='Top 15 Countries by AQI Value',
         width=250,
         height=300
-    ).to_dict()
+    ).to_dict(format='vega')
     return bar
 
 
@@ -247,9 +250,11 @@ def plot_line(pollutant, countries, time_range):
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
-        (data['countryname']== countries) &
+        #(data['countryname'].isin(countries)) &
         (data['pollutant'] == pollutant)
     ]
+    if countries:
+        filtered_data = filtered_data[data['countryname'].isin(countries)]
     
     filtered_data['time'] = filtered_data['time'].astype(str)
     
@@ -276,14 +281,14 @@ def plot_line(pollutant, countries, time_range):
             rolling_mean='mean(AQI)',
             frame=[-12, 12]
         ).encode(
-            x=alt.X('time:T', axis=alt.Axis(title='Date', format='%Y-%m')), 
-            y=alt.Y('rolling_mean:Q', axis=alt.Axis(title='Value')),  
-            color=alt.Color('countryname:N', legend=alt.Legend(title='Country'))
+            x=alt.X('time:T'), 
+            y=alt.Y('rolling_mean:Q'),  
+            color=alt.Color('countryname:N')
         )
 
     circles_line = circles + line
 
-    return circles_line.to_dict()
+    return circles_line.to_dict(format='vega')
 
 @app.callback(
     Output('data-summary-table', 'columns'),
