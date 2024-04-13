@@ -148,7 +148,10 @@ data_summary = html.Div([
 
 trend_chart = html.Div([
     html.H3('Trend of Pollutant over time'),
-    dvc.Vega(id='trend_chart', spec={}, style={'width': '100%', 'height': '100%'})
+    dvc.Vega(id='trend_chart', 
+             opt={"renderer": "svg", "actions": False}, 
+             spec={}, 
+             style={'width': '100%', 'height': '100%'})
 ])
 
 # Layout
