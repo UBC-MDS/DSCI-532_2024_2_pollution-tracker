@@ -131,7 +131,10 @@ graph_placeholder = html.Div([
 
 top_countries_chart = html.Div([
     html.H3('Top 15 Countries of Pollutant'),
-    dvc.Vega(id='top_countries_chart', spec={}, style={'width': '100%', 'height': '100%'})
+    dvc.Vega(id='top_countries_chart',
+             opt={"renderer": "svg", "actions": False},
+             spec={}, 
+             style={'width': '100%', 'height': '100%'})
 ])
 
 data_summary = html.Div([
