@@ -2,8 +2,9 @@ import dash
 from dash import html
 from dash import dcc
 import dash_vega_components as dvc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import altair as alt
+alt.data_transformers.enable("vegafusion")
 import dash_bootstrap_components as dbc
 import pandas as pd
 import dash_mantine_components as dmc
@@ -14,6 +15,7 @@ import plotly.express as px
 
 # Read in data
 data = pd.read_csv("data/processed/world_air_quality.csv")
+data['time_hour'] = pd.to_datetime(data['time_hour']).dt.tz_convert(None)
 data['time'] = pd.to_datetime(data['time']).dt.date
 
 # Setup app and layout/frontend
@@ -72,10 +74,12 @@ end_month_dropdown = dcc.Dropdown(
 )
 
 country_filter = html.Div([
-    html.Label('Select country:'),
+    html.Label('Select countries:'),
     dcc.Dropdown(
         id='country_filter',
         options=[{"label": country, "value": country} for country in data['countryname'].unique()],
+        multi=True,
+        placeholder='Select multiple countries...'
     )
 ])
 
@@ -87,7 +91,10 @@ graph_placeholder = html.Div([
 
 top_countries_chart = html.Div([
     html.H3('Top 15 Countries of Pollutant'),
-    dvc.Vega(id='top_countries_chart', spec={}, style={'width': '100%', 'height': '100%'})
+    dvc.Vega(id='top_countries_chart',
+             opt={"renderer": "svg", "actions": False},
+             spec={}, 
+             style={'width': '100%', 'height': '100%'})
 ])
 
 data_summary = html.Div([
@@ -104,7 +111,10 @@ data_summary = html.Div([
 
 trend_chart = html.Div([
     html.H3('Trend of Pollutant over time'),
-    dvc.Vega(id='trend_chart', spec={}, style={'width': '100%', 'height': '100%'})
+    dvc.Vega(id='trend_chart', 
+             opt={"renderer": "svg", "actions": False}, 
+             spec={}, 
+             style={'width': '100%', 'height': '100%'})
 ])
 
 # Layout
@@ -183,6 +193,8 @@ app.layout = html.Div([
             ])
         ], width=12),
     ]),
+    html.Div(id='dummy_output'),
+    dcc.Store(id='selected-countries', data=[]),
     html.Div(id='first_country_name', style={'display': 'none'})
 ])
 
@@ -257,9 +269,10 @@ def set_country_filter_default(first_country):
     Input("start_month", "value"),
     Input("end_year", "value"),
     Input("end_month", "value"),
+    State('selected-countries', 'data')
 )
 
-def display_choropleth(selected_pollutant, regions, start_year, start_month, end_year, end_month):
+def display_choropleth(selected_pollutant, regions, start_year, start_month, end_year, end_month, selected_countries):
     region_centers = {
     'Asia': {'lat': 34.0479, 'lon': 100.6197},
     'Europe': {'lat': 54.5260, 'lon': 15.2551},
@@ -314,9 +327,32 @@ def display_choropleth(selected_pollutant, regions, start_year, start_month, end
             projection_type = 'natural earth',
             projection_scale = projection_scale
         ),
-        margin={"r": 0, "t": 0, "l": 0, "b": 0}
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        clickmode='event+select'
     )
+
+    for trace in map.data:
+        if any(loc in selected_countries for loc in trace.locations):
+            trace.marker.line.width = 2
+            trace.marker.line.color = 'silver'
+        else:
+            trace.marker.line.width = 0
+
     return map
+
+@app.callback(
+    Output('selected-countries', 'data'),
+    [Input('graph', 'clickData')],
+    [State('selected-countries', 'data')]
+)
+def update_selected_countries(clickData, selected_countries):
+    if clickData:
+        country_name = clickData['points'][0]['location']
+        if country_name in selected_countries:
+            selected_countries.remove(country_name)
+        else:
+            selected_countries.append(country_name)
+    return selected_countries
 
 
 @app.callback(
@@ -359,7 +395,7 @@ def plot_bar(pollutant, start_year, start_month, end_year, end_month, regions):
         title='Top 15 Countries by AQI Value',
         width=250,
         height=300
-    ).to_dict()
+    ).to_dict(format='vega')
 
     if not top_countries_data.empty:
         first_country = top_countries_data.iloc[0]['countryname']
@@ -388,25 +424,45 @@ def plot_line(pollutant, countries, start_year, start_month, end_year, end_month
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
-        (data['countryname']== countries) &
+        #(data['countryname'].isin(countries)) &
         (data['pollutant'] == pollutant)
     ]
+    if countries:
+        filtered_data = filtered_data[data['countryname'].isin(list(countries))]
+    
     filtered_data['time'] = filtered_data['time'].astype(str)
-    line = alt.Chart(filtered_data).mark_line(color='black').encode(
-        x=alt.X('time:T', axis=alt.Axis(title='Date', format='%Y-%m')), 
-        y=alt.Y('value:Q', axis=alt.Axis(title='Value')),  
-        #color=alt.Color('countryname:N', legend=alt.Legend(title='Country')),
-        tooltip=[
-        alt.Tooltip('time:T', title='Date', format='%Y-%m-%d'),
-        alt.Tooltip('value:Q', title='AQI value'),
-        alt.Tooltip('countryname:N', title='Country')
-        ]
+    
+    circles = alt.Chart(filtered_data).mark_circle(
+        opacity=0.5
+        ).encode(
+            x=alt.X('time_hour:T', axis=alt.Axis(title='Date', format='%Y-%m')), 
+            y=alt.Y('AQI:Q', axis=alt.Axis(title='AQI Value')),  
+            color=alt.Color('countryname:N', legend=alt.Legend(title='Country')),
+            tooltip=[
+            alt.Tooltip('time_hour:T', title='Date', format='%Y-%m-%d'),
+            alt.Tooltip('AQI:Q', title='AQI Value'),
+            alt.Tooltip('countryname:N', title='Country')
+            ]
         ).properties(
             title='Air Quality Index (AQI) Over Time',
-            width=400,
+            width=500,
             height=300
-        ).to_dict()
-    return line
+        )
+    
+    line = alt.Chart(filtered_data).mark_line(
+            size = 3
+        ).transform_window(
+            rolling_mean='mean(AQI)',
+            frame=[-84, 84]
+        ).encode(
+            x=alt.X('time:T'), 
+            y=alt.Y('rolling_mean:Q'),  
+            color=alt.Color('countryname:N')
+        )
+
+    circles_line = circles + line
+
+    return circles_line.to_dict(format='vega')
 
 @app.callback(
     Output('data-summary-table', 'columns'),
@@ -428,9 +484,12 @@ def summary(pollutant, countries, start_year, start_month, end_year, end_month):
     filtered_data = data[
         (data['time'] >= start_date) &
         (data['time'] <= end_date) &
-        (data['countryname'] == countries) &
+        #(data['countryname'].isin(countries)) &
         (data['pollutant'] == pollutant)
     ]
+    
+    if countries:
+        filtered_data = filtered_data[data['countryname'].isin(list(countries))]
     
     country_stats = {}
 
