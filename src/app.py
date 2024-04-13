@@ -305,7 +305,7 @@ def display_choropleth(selected_pollutant, regions, start_year, start_month, end
     for trace in map.data:
         if any(loc in selected_countries for loc in trace.locations):
             trace.marker.line.width = 2
-            trace.marker.line.color = 'gold'
+            trace.marker.line.color = 'silver'
         else:
             trace.marker.line.width = 0
 
