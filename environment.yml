@@ -16,6 +16,7 @@ dependencies:
   - python=3.9.19
   - vega_datasets=0.9.0
   - vl-convert-python=1.3.0
+  - vegafusion-1.6.6
   - pip:
       - dash-bootstrap-components==1.5.0
       - dash-core-components==2.0.0
