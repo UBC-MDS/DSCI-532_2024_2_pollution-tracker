@@ -73,46 +73,6 @@ end_month_dropdown = dcc.Dropdown(
     value=12
 )
 
-# time_period_picker_1 = html.Div([
-#     html.Div(style={'width': '20%', 'display': 'inline-block'}), 
-
-#     html.Div([
-#         html.Div('Start Month', style={'margin-bottom': '5px'}),
-#         dcc.Dropdown(
-#             id='start_year',
-#             options=[{'label': year, 'value': year} for year in years],
-#             value=years[0],
-#             style={'width': '50%', 'display': 'inline-block'}
-#         ),
-#         dcc.Dropdown(
-#             id='start_month',
-#             options=[{'label': month, 'value': i+1} for i, month in enumerate(month_names)],
-#             value=1,
-#             style={'width': '50%', 'display': 'inline-block'}
-#         ),
-#     ], style={'display': 'inline-block', 'width': '29%', 'vertical-align': 'top'}),
-
-#     html.Div('|', style={'display': 'inline-block', 'width': '2%', 'text-align': 'center', 'font-size': '24px'}),
-
-#     html.Div([
-#         html.Div('End Month', style={'margin-bottom': '5px'}),
-#         dcc.Dropdown(
-#             id='end_year',
-#             options=[{'label': year, 'value': year} for year in years],
-#             value=years[-1],
-#             style={'width': '50%', 'display': 'inline-block'}
-#         ),
-#         dcc.Dropdown(
-#             id='end_month',
-#             options=[{'label': month, 'value': i+1} for i, month in enumerate(month_names)],
-#             value=12,
-#             style={'width': '50%', 'display': 'inline-block'}
-#         ),
-#     ], style={'display': 'inline-block', 'width': '29%', 'vertical-align': 'top'}),
-    
-#     html.Div(style={'width': '20%', 'display': 'inline-block'}), 
-# ], style={"width": "100%", 'textAlign': 'center'})
-
 country_filter = html.Div([
     html.Label('Select countries:'),
     dcc.Dropdown(
@@ -233,10 +193,70 @@ app.layout = html.Div([
             ])
         ], width=12),
     ]),
+    html.Div(id='first_country_name', style={'display': 'none'})
 ])
 
+@app.callback(
+    Output('country_filter', 'options'),
+[
+    Input('pollutant_type_filter', 'value'),
+    Input("start_year", "value"),
+    Input("start_month", "value"),
+    Input("end_year", "value"),
+    Input("end_month", "value"),
+    Input("region_filter", "value"),
+    ]
+)
+def update_country_options(selected_pollutant, start_year, start_month, end_year, end_month, regions):
+    start_date_str = f"{start_year}-{start_month:02d}"
+    end_date_str = f"{end_year}-{end_month:02d}"
+    start_date = pd.to_datetime(start_date_str).date()
+    end_date = pd.to_datetime(end_date_str).date()
+
+    filtered_data = data[
+        (data['pollutant'] == selected_pollutant) &
+        (data['time'] >= start_date) &
+        (data['time'] <= end_date)
+    ]
+
+    if regions:
+        filtered_data = filtered_data[filtered_data['continent'].isin(regions)]
+
+    unique_countries = filtered_data['countryname'].unique()
+    return [{'label': country, 'value': country} for country in unique_countries]
+
+@app.callback(
+    Output('region_filter', 'options'),
+[
+    Input('pollutant_type_filter', 'value'),
+    Input("start_year", "value"),
+    Input("start_month", "value"),
+    Input("end_year", "value"),
+    Input("end_month", "value"),
+    ]
+)
+def update_region_options(selected_pollutant, start_year, start_month, end_year, end_month):
+    start_date_str = f"{start_year}-{start_month:02d}"
+    end_date_str = f"{end_year}-{end_month:02d}"
+    start_date = pd.to_datetime(start_date_str).date()
+    end_date = pd.to_datetime(end_date_str).date()
+
+    filtered_data = data[
+        (data['pollutant'] == selected_pollutant) &
+        (data['time'] >= start_date) &
+        (data['time'] <= end_date)
+    ]
+
+    unique_continent = filtered_data['continent'].unique()
+    return [{'label': continent, 'value': continent} for continent in unique_continent]
 
 
+@app.callback(
+    Output('country_filter', 'value'),
+    [Input('first_country_name', 'children')]
+)
+def set_country_filter_default(first_country):
+    return first_country
 
 # Set up callbacks/backend
 @app.callback(
@@ -250,6 +270,15 @@ app.layout = html.Div([
 )
 
 def display_choropleth(selected_pollutant, regions, start_year, start_month, end_year, end_month):
+    region_centers = {
+    'Asia': {'lat': 34.0479, 'lon': 100.6197},
+    'Europe': {'lat': 54.5260, 'lon': 15.2551},
+    'Africa': {'lat': -8.7832, 'lon': 34.5085},
+    'North America': {'lat': 54.5260, 'lon': -105.2551},
+    'South America': {'lat': -8.7832, 'lon': -55.4915},
+    'Australia': {'lat': -25.2744, 'lon': 133.7751}
+}
+
     start_date_str = f"{start_year}-{start_month:02d}"
     end_date_str = f"{end_year}-{end_month:02d}"
     start_date = pd.to_datetime(start_date_str).date()
@@ -279,14 +308,30 @@ def display_choropleth(selected_pollutant, regions, start_year, start_month, end
         color_continuous_scale=px.colors.sequential.Plasma,  # Example color scale
     )
 
+    if regions and len(regions) == 0:
+        center = None
+        projection_scale = 1
+    elif regions and len(regions) == 1: 
+        center = region_centers.get(regions[0], {'lat': 0, 'lon': 0})
+        projection_scale = 1.5
+    else:
+        center = {'lat': 0, 'lon': 0}
+        projection_scale = 1
+            
     map.update_layout(
-        margin={"r": 0, "t": 0, "l": 0, "b": 0})
-
+        geo=dict(
+            center = center,
+            projection_type = 'natural earth',
+            projection_scale = projection_scale
+        ),
+        margin={"r": 0, "t": 0, "l": 0, "b": 0}
+    )
     return map
 
 
 @app.callback(
     Output("top_countries_chart", "spec"),
+    Output("first_country_name", "children"),
     [
         Input("pollutant_type_filter", "value"),
         Input("start_year", "value"),
@@ -326,7 +371,12 @@ def plot_bar(pollutant, start_year, start_month, end_year, end_month, regions):
         height=300
     ).to_dict(format='vega')
 
-    return bar
+    if not top_countries_data.empty:
+        first_country = top_countries_data.iloc[0]['countryname']
+    else:
+        first_country = None
+    
+    return bar, first_country
 
 
 @app.callback(
