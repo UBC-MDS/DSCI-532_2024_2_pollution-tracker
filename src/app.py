@@ -431,15 +431,38 @@ def summary(pollutant, countries, start_year, start_month, end_year, end_month):
         (data['countryname'] == countries) &
         (data['pollutant'] == pollutant)
     ]
-    summary = filtered_data.describe().reset_index()
-    summary.rename(columns={'index': 'Statistic'}, inplace=True)
+    
+    country_stats = {}
 
-    # Round numerical columns to two decimal places
-    for col in summary.select_dtypes(include=['float64']).columns:
-        summary[col] = summary[col].round(2)
+    for country in filtered_data['countryname'].unique():
+        country_data = filtered_data[filtered_data['countryname'] == country]['value']
+        min_value = country_data.min().round(2)
+        avg_value = country_data.mean().round(2)
+        max_value = country_data.max().round(2)
+        unit_meas = filtered_data[filtered_data['countryname'] == country]['unit'].iloc[0]
+        num_obs = country_data.shape[0]
+        pol_type = filtered_data[filtered_data['countryname'] == country]['pollutant'].iloc[0]
+        
+        country_stats[country] = {
+            'Country': country,
+            'Pollutant': pol_type,
+            'Unit of Measurement': unit_meas,
+            'Minimum': min_value, 
+            'Average': avg_value, 
+            'Maximum ': max_value,
+            'No. of Observations': num_obs
+            }
+    
+    table = (pd.DataFrame
+             .from_dict(country_stats, orient='index')
+             .T
+             .reset_index()
+             .rename(columns={'index': ''})
+             .tail(6)
+             )
 
-    columns = [{"name": i, "id": i} for i in summary.columns]
-    summary_data = summary.to_dict('records')
+    columns = [{"name": i, "id": i} for i in table.columns]
+    summary_data = table.to_dict('records')
 
     return columns, summary_data
 
