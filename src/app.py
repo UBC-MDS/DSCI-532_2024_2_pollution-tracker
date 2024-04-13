@@ -118,7 +118,6 @@ country_filter = html.Div([
     dcc.Dropdown(
         id='country_filter',
         options=[{"label": country, "value": country} for country in data['countryname'].unique()],
-        value=['China', 'India', 'United States of America'],  # default selected value
         multi=True,
         placeholder='Select multiple countries...'
     )
