@@ -12,15 +12,15 @@ _Pollution Tracker_ utilizes the [World Air Quality Data 2024 (Updated)](https:/
 ### Who is it for?
 _Pollution Tracker_ is intended for use by public health officials but designed for anyone interested in the environment, public health, or public policy. We hope it enables these individuals to get a clear idea of air quality metrics and their trends. Our project is built on data sourced from OpenDataSoft, guaranteeing both reliability and  transparency.
 
-## What is AQI? 
+### Why should we care?
+Air pollution is worldwide one of the greatest threats to human and environmental health. Pollutants like particulate matter (PM), carbon monoxide (CO), and ozone ($O_3$) are inhaled and absorbed into the body through the lungs, leading to an increased risk of mortality and diseases like stroke, heart disease, lung cancer, and pneumonia. This increased risk of morbidity and mortality can be seen after a relatively short exposure period for some pollutants, and at-risk populations such as the elderly, children, and pregnant women are particularly susceptible to the effects of air pollution.
+
+### What is AQI? 
 Air Quality Index (AQI) is an indicator of air quality developed by government health authorities to communicate the level of air pollution in an area. When AQI levels are high, several subgroups are affected by it's negative impacts - children, seniors, and those with respiratory and cardiorespiratory illnesses. In times of high AQI, health bodies suggest people stay indoors, use high-efficiency particulate absorbing (HEPA) filters, wear NIOSH N95, and avoid any risk to their health. 
 
 AQI is calculated as the maximum of the index of pollutant $p$, where this index is defined as: $I_p = \left\lfloor \frac{(I_{\text{high}} - I_{\text{low}}) \times (C_p - C_{\text{low}})}{(C_{\text{high}} - C_{\text{low}})} + I_{\text{low}} \right\rfloor \quad$ $\forall p \in [\{\text{CO}_2, \text{CO}, \text{O}_3, \text{PM2.5}, \text{PM10}, \text{SO}_x, \text{NO}_x\}]$. This index is the linear interpolation of concentration between concentration breakpoints ${C}$ for pollutant $p$. However, the values are often represented as one of five groups (labels vary by country): good, moderate, unhealthy for sensitive groups, unhealthy, very unhealthy, and hazardous. 
 
 Needless to say, high AQI is a major problem for millions of people and health authorities. Given that this dashboard is intended for use by health officials, engineering an AQI feature is imperative for ensuring our public health officials are well-equipped to deal with pollution-related crises. This feature not only eliminates the need for users to convert pollutant concentration into AQI, but also saves time and prevents conversion errors. 
-
-### Why should we care?
-Air pollution is worldwide one of the greatest threats to human and environmental health. Pollutants like particulate matter (PM), carbon monoxide (CO), and ozone ($O_3$) are inhaled and absorbed into the body through the lungs, leading to an increased risk of mortality and diseases like stroke, heart disease, lung cancer, and pneumonia. This increased risk of morbidity and mortality can be seen after a relatively short exposure period for some pollutants, and at-risk populations such as the elderly, children, and pregnant women are particularly susceptible to the effects of air pollution.
 
 ### Can I run your app locally?
 If you'd like to play around with our project, feel free to clone this repository using whatever method you prefer. The SSH key method is below:
