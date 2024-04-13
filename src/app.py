@@ -402,7 +402,7 @@ def plot_line(pollutant, countries, start_year, start_month, end_year, end_month
         (data['pollutant'] == pollutant)
     ]
     if countries:
-        filtered_data = filtered_data[data['countryname'].isin(countries)]
+        filtered_data = filtered_data[data['countryname'].isin(list(countries))]
     
     filtered_data['time'] = filtered_data['time'].astype(str)
     
@@ -462,7 +462,7 @@ def summary(pollutant, countries, start_year, start_month, end_year, end_month):
         (data['pollutant'] == pollutant)
     ]
     if countries:
-        filtered_data = filtered_data[data['countryname'].isin(countries)]
+        filtered_data = filtered_data[data['countryname'].isin(list(countries))]
         
     summary = filtered_data.describe().reset_index()
     summary.rename(columns={'index': 'Statistic'}, inplace=True)
