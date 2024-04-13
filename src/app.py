@@ -2,7 +2,7 @@ import dash
 from dash import html
 from dash import dcc
 import dash_vega_components as dvc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import altair as alt
 alt.data_transformers.enable("vegafusion")
 import dash_bootstrap_components as dbc
@@ -193,6 +193,8 @@ app.layout = html.Div([
             ])
         ], width=12),
     ]),
+    html.Div(id='dummy_output'),
+    dcc.Store(id='selected-countries', data=[]),
     html.Div(id='first_country_name', style={'display': 'none'})
 ])
 
@@ -267,9 +269,10 @@ def set_country_filter_default(first_country):
     Input("start_month", "value"),
     Input("end_year", "value"),
     Input("end_month", "value"),
+    State('selected-countries', 'data')
 )
 
-def display_choropleth(selected_pollutant, regions, start_year, start_month, end_year, end_month):
+def display_choropleth(selected_pollutant, regions, start_year, start_month, end_year, end_month, selected_countries):
     region_centers = {
     'Asia': {'lat': 34.0479, 'lon': 100.6197},
     'Europe': {'lat': 54.5260, 'lon': 15.2551},
@@ -324,9 +327,32 @@ def display_choropleth(selected_pollutant, regions, start_year, start_month, end
             projection_type = 'natural earth',
             projection_scale = projection_scale
         ),
-        margin={"r": 0, "t": 0, "l": 0, "b": 0}
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        clickmode='event+select'
     )
+
+    for trace in map.data:
+        if any(loc in selected_countries for loc in trace.locations):
+            trace.marker.line.width = 2
+            trace.marker.line.color = 'silver'
+        else:
+            trace.marker.line.width = 0
+
     return map
+
+@app.callback(
+    Output('selected-countries', 'data'),
+    [Input('graph', 'clickData')],
+    [State('selected-countries', 'data')]
+)
+def update_selected_countries(clickData, selected_countries):
+    if clickData:
+        country_name = clickData['points'][0]['location']
+        if country_name in selected_countries:
+            selected_countries.remove(country_name)
+        else:
+            selected_countries.append(country_name)
+    return selected_countries
 
 
 @app.callback(
