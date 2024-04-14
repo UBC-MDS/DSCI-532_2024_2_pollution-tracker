@@ -67,7 +67,7 @@ def get_datepickers():
     return start_year_dropdown, start_month_dropdown, end_year_dropdown, end_month_dropdown
 
 graph_placeholder = html.Div([
-    html.Label('Worldwide Distribution'),
+    html.Label('Worldwide Distribution', style={'fontSize': '29px', 'textAlign': 'center'}),
     dcc.Graph(id='graph'),  # Placeholder for the pollution map
 ])
 
@@ -104,77 +104,70 @@ def get_layout(data):
     start_year_dropdown, start_month_dropdown, end_year_dropdown, end_month_dropdown = get_datepickers()
 
     layout = html.Div([
-        dbc.Row(html.H1('Pollutant Tracker'), justify="center"),
-        dbc.Row(pollutant_filter, justify="center"),
+        dbc.Row(
+        dbc.Col(html.H1('Pollution Tracker', className='text-center my-4'), width=12),
+        justify='center',
+        align='center',
+        className='g-0',  # No gutters
+    ),
+        dbc.Row(pollutant_filter, justify="center", style={'color': 'white'}),
         dbc.Row([
             dbc.Col(width=1.3), 
             dbc.Col(html.Div([
-                html.Label('Start Year:'),
+                html.Label('Start Year:', style={'color': 'white'}),
                 start_year_dropdown
             ]), width=2), 
             dbc.Col(html.Div([
-                html.Label('Start Month:'),
+                html.Label('Start Month:', style={'color': 'white'}),
                 start_month_dropdown
             ]), width=2),
             dbc.Col(width=0.7),
             dbc.Col(html.Div(className='text-center', style={'borderLeft': '1px solid #ccc', 'height': '50px'}), width=0.7),
             dbc.Col(html.Div([
-                html.Label('End Year:'),
+                html.Label('End Year:', style={'color': 'white'}),
                 end_year_dropdown
             ]), width=2),  
             dbc.Col(html.Div([
-                html.Label('End Month:'),
+                html.Label('End Month:', style={'color': 'white'}),
                 end_month_dropdown
             ]), width=2),
             dbc.Col(width=1.3),
         ], justify="center"),
-        html.Hr(),
-        # First card with header: Region, Time Period Picker for Region, Graph, and Top Countries Chart
-        dbc.Card(
-            [
-                dbc.CardHeader("Worldwide Comparison", className="font-weight-bold"),  # Card header with title
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col(region_filter, width=3)
-                    ], justify="start"),
-                    html.Hr(), 
-                    dbc.Row([
-                        dbc.Col(graph_placeholder, width=8),
-                        dbc.Col(top_countries_chart, width=4)
-                    ], justify="around"),
-                ]),
-            ],
-            className="mb-3", 
-        ),
-        # Second card with header: Country Filter, Time Period Picker for Country, Data Summary, and Trend Chart
-        dbc.Card(
-            [
-                dbc.CardHeader("Country of Interest Trend", className="font-weight-bold"),  # Card header with title
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col(country_filter, width=3),
-                    ], justify="start"),
-                    html.Hr(),  
-                    dbc.Row([
-                        dbc.Col(trend_chart, width=4),
-                        dbc.Col(data_summary, width=4),
-                    ], justify="around"),
-                ]),
-            ],
-            className="mb-3",
-        ),
+        html.Hr(style={'borderTop': '1px solid white'}),
+        # Cards with default background from CSS
+        dbc.Card([
+            dbc.CardHeader("Worldwide Comparison", className="font-weight-bold"),
+            dbc.CardBody([
+                dbc.Row([dbc.Col(region_filter, width=3)], justify="start"),
+                html.Hr(), 
+                dbc.Row([
+                    dbc.Col(graph_placeholder, width=8),
+                    dbc.Col(top_countries_chart, width=4)
+                ], justify="around"),
+            ]),
+        ], className="mb-3"),
+        dbc.Card([
+            dbc.CardHeader("Country of Interest Trend", className="font-weight-bold"),
+            dbc.CardBody([
+                dbc.Row([dbc.Col(country_filter, width=3)], justify="start"),
+                html.Hr(),  
+                dbc.Row([
+                    dbc.Col(trend_chart, width=4),
+                    dbc.Col(data_summary, width=4),
+                ], justify="around"),
+            ]),
+        ], className="mb-3"),
         dbc.Row([
             dbc.Col([
                 html.Div([
-                    html.P(" ", style={"font-size": "16px"}),
                     html.P("This dashboard visualizes global air pollution levels, making it easy to explore global and local trends",
-                        style={"font-size": "16px"}),
+                        style={"font-size": "16px", 'color': 'white'}),
                     html.P("Creators: Merete Lutz, Kun Ya, Weiran Zhao, Sid Grover",
-                        style={"font-size": "12px"}),
+                        style={"font-size": "12px", 'color': 'white'}),
                     html.A("GitHub Repository", href="https://github.com/UBC-MDS/DSCI-532_2024_2_pollution-tracker",
-                        target="_blank", style={"font-size": "12px"}),
+                        target="_blank", style={"font-size": "12px", 'color': '#00BFFF'}),
                     html.P("Last updated on April 7, 2024",
-                        style={"font-size": "12px"}),
+                        style={"font-size": "12px", 'color': 'white'}),
                 ])
             ], width=12),
         ]),
@@ -182,5 +175,6 @@ def get_layout(data):
         dcc.Store(id='selected-countries', data=[]),
         html.Div(id='first_country_name', style={'display': 'none'})
     ])
+
 
     return layout

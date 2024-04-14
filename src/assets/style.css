@@ -1,0 +1,12 @@
+body {
+    background-color: #2d2c2c; /* Dark grey background */
+    color: #fff; /* White text color for better visibility on dark background */
+}
+
+.card {
+    background-color: #fff; /* Light background for the cards */
+    color: #000000; /* Dark text color for readability */
+    border: 1px solid #ddd; /* Light grey border for visibility */
+    margin: 50px; /* Wider margin around the cards */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional: Adds subtle shadow for depth */
+}

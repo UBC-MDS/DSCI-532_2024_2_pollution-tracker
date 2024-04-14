@@ -1,6 +1,7 @@
 import pandas as pd
 import plotly.express as px
 import altair as alt
+alt.data_transformers.enable("vegafusion")
 from dash.dependencies import Input, Output, State
 import json
 
@@ -78,7 +79,7 @@ def register_callbacks(app, data):
         Input("end_month", "value"),
         State('selected-countries', 'data')
     )
-
+    
     def display_choropleth(selected_pollutant, regions, start_year, start_month, end_year, end_month, selected_countries):
         region_centers = {
         'Asia': {'lat': 34.0479, 'lon': 100.6197},
@@ -109,20 +110,20 @@ def register_callbacks(app, data):
 
         aggregated_data = filtered_data.groupby('countryname')['AQI_cat'].agg(lambda x: pd.Series.mode(x)[0]).reset_index()
         
-        category_color_scale = {
-            'Good': '#66bb6a',              # Light Green
-            'Moderate': '#ffee58',          # Light Yellow
-            'Unhealthy for Sensitive Groups': '#ffa726',  # Light Orange
-            'Unhealthy': '#ef5350',         # Light Red
-            'Very Unhealthy': '#c62828',    # Dark Red
-            'Hazardous': '#b71c1c'          # Very Dark Red
-        }
+        category_color_scale = dict([
+            ('Good', '#98FB98'),  # Pale Green
+            ('Moderate', '#FFFF99'),  # Light Yellow
+            ('Unhealthy for Sensitive Groups', '#FFD700'),  # Gold
+            ('Unhealthy', '#FFA500'),  # Orange
+            ('Very Unhealthy', '#FF6347'),  # Tomato Red
+            ('Hazardous', '#B22222')  # Firebrick Red
+        ])
         
         map = px.choropleth(
             aggregated_data,
             geojson=countries_geojson,
             locations='countryname',
-            color='color',
+            color='AQI_cat',
             featureidkey="properties.admin",
             color_discrete_map=category_color_scale 
         )
@@ -198,23 +199,38 @@ def register_callbacks(app, data):
         if regions:
             filtered_data = filtered_data[filtered_data['continent'].isin(regions)]
 
-        top_countries_data = filtered_data.groupby('countryname', as_index=False)['value'].mean().sort_values(by='value', ascending=False).head(15)
+        aggregated_data = filtered_data.groupby('countryname').agg(
+            mean_value=pd.NamedAgg(column='value', aggfunc='mean'),
+            most_frequent_cat=pd.NamedAgg(column='AQI_cat', aggfunc=lambda x: pd.Series.mode(x).iloc[0])
+        ).reset_index()
+        
+        aggregated_data = aggregated_data.sort_values(by='mean_value', ascending=False).head(15)
+        
+        category_color_scale = dict([
+            ('Good', '#98FB98'),  # Pale Green
+            ('Moderate', '#FFFF99'),  # Light Yellow
+            ('Unhealthy for Sensitive Groups', '#FFD700'),  # Gold
+            ('Unhealthy', '#FFA500'),  # Orange
+            ('Very Unhealthy', '#FF6347'),  # Tomato Red
+            ('Hazardous', '#B22222')  # Firebrick Red
+        ])
 
-        bar = alt.Chart(top_countries_data).mark_bar(fill='black').encode(
-            x=alt.X('value:Q', title='Average AQI Value'),
+        bar = alt.Chart(aggregated_data).mark_bar().encode(
+            x=alt.X('mean_value:Q', title='Average AQI Value'),
             y=alt.Y('countryname:N', title='Country', sort='-x'),
+            fill=alt.Color('most_frequent_cat:N', scale=alt.Scale(domain=list(category_color_scale.keys()), range=list(category_color_scale.values())), legend=None),
             tooltip=[
                 alt.Tooltip('countryname:N', title='Country'),
-                alt.Tooltip('value:Q', title='AQI value')
+                alt.Tooltip('mean_value:Q', title='AQI value'),
+                alt.Tooltip('most_frequent_cat:N', title='AQI category')
             ]
         ).properties(
-            title='Top 15 Countries by AQI Value',
             width=250,
-            height=300
+            height=370
         ).to_dict(format='vega')
 
-        if not top_countries_data.empty:
-            first_country = top_countries_data.iloc[0]['countryname']
+        if not aggregated_data.empty:
+            first_country = aggregated_data.iloc[0]['countryname']
         else:
             first_country = None
         
@@ -310,9 +326,9 @@ def register_callbacks(app, data):
 
         for country in filtered_data['countryname'].unique():
             country_data = filtered_data[filtered_data['countryname'] == country]['value']
-            min_value = country_data.min().round(2)
-            avg_value = country_data.mean().round(2)
-            max_value = country_data.max().round(2)
+            min_value = round(country_data.min(), 2)
+            avg_value = round(country_data.mean(), 2)
+            max_value = round(country_data.max(), 2)
             unit_meas = filtered_data[filtered_data['countryname'] == country]['unit'].iloc[0]
             num_obs = country_data.shape[0]
             pol_type = filtered_data[filtered_data['countryname'] == country]['pollutant'].iloc[0]
