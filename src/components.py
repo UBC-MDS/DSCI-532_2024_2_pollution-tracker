@@ -66,6 +66,39 @@ def get_datepickers():
 
     return start_year_dropdown, start_month_dropdown, end_year_dropdown, end_month_dropdown
 
+graph_placeholder = html.Div([
+    html.Label('Worldwide Distribution'),
+    dcc.Graph(id='graph'),  # Placeholder for the pollution map
+])
+
+top_countries_chart = html.Div([
+    html.H3('Top 15 Countries of Pollutant'),
+    dvc.Vega(id='top_countries_chart',
+             opt={"renderer": "svg", "actions": False},
+             spec={}, 
+             style={'width': '100%', 'height': '100%'})
+])
+
+data_summary = html.Div([
+    html.H3('Data Summary'),
+    dash_table.DataTable(
+        id='data-summary-table',
+        style_cell={'textAlign': 'center'},
+        style_header={
+            'backgroundColor': 'white',
+            'fontWeight': 'bold'
+        },
+    )
+], style={'width': '100%'})
+
+trend_chart = html.Div([
+    html.H3('Trend of Pollutant over time'),
+    dvc.Vega(id='trend_chart', 
+             opt={"renderer": "svg", "actions": False}, 
+             spec={}, 
+             style={'width': '100%', 'height': '100%'})
+])
+
 def get_layout(data):
     pollutant_filter, region_filter, country_filter = get_filters(data)
     start_year_dropdown, start_month_dropdown, end_year_dropdown, end_month_dropdown = get_datepickers()
