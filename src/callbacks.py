@@ -48,6 +48,10 @@ def register_callbacks(app, data):
         ]
     )
     def display_choropleth(selected_pollutant, regions, start_year, start_month, end_year, end_month):
+        # Load GeoJSON for each callback execution
+        with open("data/raw/custom.geo.json", "r", encoding="utf-8") as f:
+            countries_geojson = json.load(f)
+        
         start_date_str = f"{start_year}-{start_month:02d}"
         end_date_str = f"{end_year}-{end_month:02d}"
         start_date = pd.to_datetime(start_date_str).date()
@@ -62,14 +66,22 @@ def register_callbacks(app, data):
         if regions:
             filtered_data = filtered_data[filtered_data['continent'].isin(regions)]
 
-        aggregated_data = filtered_data.groupby('countryname')['value'].mean().reset_index()
+        aggregated_data = filtered_data.groupby('countryname')['AQI_cat'].agg(lambda x: pd.Series.mode(x)[0]).reset_index()
+        
+        category_color_scale = {
+        'Low': 'green',
+        'Medium': 'yellow',
+        'High': 'red',
+        'Very High': 'purple'
+        }
         
         fig = px.choropleth(
-            aggregated_data,
-            locations='countryname',
-            color='value',
-            hover_name='countryname',
-            color_continuous_scale=px.colors.sequential.Plasma
+        aggregated_data,
+        geojson=countries_geojson,
+        locations='coucntryname',
+        color='color',
+        featureidkey="properties.admin",
+        color_discrete_map=category_color_scale 
         )
 
         return fig
