@@ -10,3 +10,28 @@ body {
     margin: 50px; /* Wider margin around the cards */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional: Adds subtle shadow for depth */
 }
+
+/* Override the text color for dropdown options */
+.Select-option {
+    color: #333333 !important;  /* Dark text color */
+}
+
+/* Override the text color for selected dropdown option */
+.Select-value-label {
+    color: #333333 !important;  /* Dark text color */
+}
+
+/* Override the text color for placeholder text in dropdown */
+.Select-placeholder {
+    color: #333333 !important;  /* Dark text color */
+}
+
+/* Override the border color for dropdown */
+.Select-control {
+    border-color: #333333 !important;  /* Dark border color */
+}
+
+/* Override the border color for dropdown when focused */
+.Select-control:hover, .Select-control:focus {
+    border-color: #333333 !important;  /* Dark border color */
+}

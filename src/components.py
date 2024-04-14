@@ -43,25 +43,41 @@ def get_datepickers():
     start_year_dropdown = dcc.Dropdown(
         id='start_year',
         options=[{'label': year, 'value': year} for year in years],
-        value=years[0]
+        value=years[0],
+        style={
+        'color': '#333333',  # Dark text color
+        'borderColor': '#333333'  # Dark border color
+    }
     )
 
     start_month_dropdown = dcc.Dropdown(
         id='start_month',
         options=[{'label': month, 'value': i+1} for i, month in enumerate(month_names)],
-        value=1
+        value=1,
+        style={
+        'color': '#333333',  # Dark text color
+        'borderColor': '#333333'  # Dark border color
+    }
     )
 
     end_year_dropdown = dcc.Dropdown(
         id='end_year',
         options=[{'label': year, 'value': year} for year in years],
-        value=years[-1]
+        value=years[-1],
+        style={
+        'color': '#333333',  # Dark text color
+        'borderColor': '#333333'  # Dark border color
+    }
     )
 
     end_month_dropdown = dcc.Dropdown(
         id='end_month',
         options=[{'label': month, 'value': i+1} for i, month in enumerate(month_names)],
-        value=12
+        value=12,
+        style={
+        'color': '#333333',  # Dark text color
+        'borderColor': '#333333'  # Dark border color
+    }
     )
 
     return start_year_dropdown, start_month_dropdown, end_year_dropdown, end_month_dropdown
@@ -112,26 +128,22 @@ def get_layout(data):
     ),
         dbc.Row(pollutant_filter, justify="center", style={'color': 'white'}),
         dbc.Row([
-            dbc.Col(width=1.3), 
             dbc.Col(html.Div([
                 html.Label('Start Year:', style={'color': 'white'}),
                 start_year_dropdown
-            ]), width=2), 
+            ]), width=2),
             dbc.Col(html.Div([
                 html.Label('Start Month:', style={'color': 'white'}),
                 start_month_dropdown
             ]), width=2),
-            dbc.Col(width=0.7),
-            dbc.Col(html.Div(className='text-center', style={'borderLeft': '1px solid #ccc', 'height': '50px'}), width=0.7),
             dbc.Col(html.Div([
                 html.Label('End Year:', style={'color': 'white'}),
                 end_year_dropdown
-            ]), width=2),  
+            ]), width=2),
             dbc.Col(html.Div([
                 html.Label('End Month:', style={'color': 'white'}),
                 end_month_dropdown
             ]), width=2),
-            dbc.Col(width=1.3),
         ], justify="center"),
         html.Hr(style={'borderTop': '1px solid white'}),
         # Cards with default background from CSS
