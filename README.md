@@ -43,10 +43,10 @@ Activate the environment with the following command:
  conda activate pollution-tracker
 ```
 
-To launch the dashboard, navigate to the root of the repository in your terminal and enter the following command:
+To launch the dashboard, navigate to the src folder of the repository in your terminal and enter the following command:
 
 ```bash
-python src/app.py
+python app.py
 ```
 
 You should see some output in your terminal that looks similar to: 
