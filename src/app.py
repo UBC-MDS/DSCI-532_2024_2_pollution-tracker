@@ -9,7 +9,7 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "Air Quality Tracker"
 
 # Load data
-data, geojson = load_data()
+data = load_data()
 
 # Setup the layout using components from components.py
 app.layout = get_layout(data)
