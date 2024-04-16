@@ -276,7 +276,7 @@ def register_callbacks(app, data):
         filtered_data['time'] = filtered_data['time'].astype(str)
         
         circles = alt.Chart(filtered_data).mark_circle(
-            opacity=0.5
+            opacity=0.3
             ).encode(
                 x=alt.X('time_hour:T', axis=alt.Axis(title='Date', format='%Y-%m')), 
                 y=alt.Y('AQI:Q', axis=alt.Axis(title='AQI Value')),  
@@ -292,18 +292,11 @@ def register_callbacks(app, data):
                 height=300
             )
         
-        line = alt.Chart(filtered_data).mark_line(
-                size = 3
-            ).transform_window(
-                rolling_mean='mean(AQI)',
-                frame=[-84, 84]
-            ).encode(
-                x=alt.X('time:T'), 
-                y=alt.Y('rolling_mean:Q'),  
-                color=alt.Color('countryname:N')
+        circles_line = circles + circles.mark_line(size=3).transform_regression(
+                'time_hour',
+                'AQI',
+                groupby=['countryname']
             )
-
-        circles_line = circles + line
 
         return circles_line.to_dict(format='vega')
 
