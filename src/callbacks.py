@@ -259,7 +259,9 @@ def register_callbacks(app, data):
             (data['pollutant'] == pollutant)
         ]
         if countries:
-            filtered_data = filtered_data[data['countryname'].isin(list(countries))]
+            if not isinstance(countries, list):
+                countries = [countries]
+            filtered_data = filtered_data[data['countryname'].isin(countries)]
         
         filtered_data['time'] = filtered_data['time'].astype(str)
         
@@ -320,7 +322,9 @@ def register_callbacks(app, data):
         ]
         
         if countries:
-            filtered_data = filtered_data[data['countryname'].isin(list(countries))]
+            if not isinstance(countries, list):
+                countries = [countries]
+            filtered_data = filtered_data[data['countryname'].isin(countries)]
         
         country_stats = {}
 
