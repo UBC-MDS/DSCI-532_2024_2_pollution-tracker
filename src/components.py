@@ -82,6 +82,85 @@ def get_datepickers():
 
     return start_year_dropdown, start_month_dropdown, end_year_dropdown, end_month_dropdown
 
+collapse_button = dbc.Button(
+    "Learn more",
+    id="collapse-button",
+    outline=False,
+    style={
+        'width': '150px',
+        'background-color': 'white',
+        'color': '#333333',
+        'margin-top': 10,
+        'border-color': 'gray'
+    }
+)
+
+collapse_section = dbc.Collapse(
+    dbc.Container([
+         html.P(
+            [
+                html.Strong("Air Quality Index (AQI)"),
+                " is an indicator of air quality developed by government health authorities to communicate the level of air pollution in an area. "
+                "When AQI levels are high, several subgroups are affected by its negative impacts - children, seniors, and those with respiratory and cardiorespiratory illnesses. "
+                "In times of high AQI, health bodies suggest people stay indoors, use high-efficiency particulate absorbing (HEPA) filters, wear NIOSH N95, and avoid any risk to their health.",
+            ],
+            style={'color': 'white'}
+        ),
+        html.P(
+            [
+                "For more information, please ",
+                html.A("visit here", href="https://github.com/UBC-MDS/DSCI-532_2024_2_pollution-tracker", target="_blank"),
+                "."
+            ],
+            style={'color': 'white'}
+        ),
+        html.P(
+            [
+                html.Strong("PM2.5 (Particulate Matter 2.5):"),
+                " PM2.5 refers to fine particulate matter that is less than 2.5 micrometers in diameter. "
+                "These tiny particles can penetrate deep into the respiratory system, entering the lungs and even the bloodstream, causing a variety of health problems. "
+                "Sources include vehicle emissions, industrial processes, and natural sources like wildfires."
+            ],
+            style={'color': 'white'}
+        ),
+        html.P(
+            [
+                html.Strong("NO (Nitric Oxide):"),
+                " Nitric oxide is a colorless gas that is a by-product of combustion processes, particularly at high temperatures found in car engines and power plants. "
+                "While not directly harmful, NO rapidly transforms into nitrogen dioxide (NO2) in the atmosphere, which is a major air pollutant and contributes to the formation of smog and acid rain."
+            ],
+            style={'color': 'white'}
+        ),
+        html.P(
+            [
+                html.Strong("CO (Carbon Monoxide):"),
+                " Carbon monoxide is a colorless, odorless gas produced by the incomplete combustion of carbon-containing fuels. "
+                "It is particularly dangerous in enclosed spaces, as it can interfere with the blood's ability to carry oxygen, leading to serious health effects like headaches, dizziness, and even death at high concentrations."
+            ],
+            style={'color': 'white'}
+        ),
+        html.P(
+            [
+                html.Strong("NOx (Nitrogen Oxides):"),
+                " NOx is a collective term for nitrogen oxides, including NO and NO2. These gases are mainly produced from vehicle emissions and industrial activities. "
+                "NOx gases are contributors to environmental issues such as smog, acid rain, and can exacerbate respiratory diseases such as asthma by irritating the airways."
+            ],
+            style={'color': 'white'}
+        ),
+        html.P(
+            [
+                html.Strong("PM10 (Particulate Matter 10):"),
+                " PM10 includes particles that are 10 micrometers or smaller in diameter. "
+                "These particles are smaller than the thickness of a human hair and can be inhaled into the respiratory tract. "
+                "Sources of PM10 include dust from roads, construction sites, and other similar sources of fine particles."
+            ],
+            style={'color': 'white'}
+        ),
+    ], fluid=True),
+    id="collapse",
+    style={'width': '70%', 'margin': 'auto'}  # Adjust width and centering
+)
+
 graph_placeholder = html.Div([
     html.Label('Worldwide Distribution', style={'fontSize': '29px', 'textAlign': 'center'}),
     dcc.Graph(id='graph'),  # Placeholder for the pollution map
@@ -120,11 +199,10 @@ def get_layout(data):
     start_year_dropdown, start_month_dropdown, end_year_dropdown, end_month_dropdown = get_datepickers()
 
     layout = html.Div([
-        dbc.Row(
-        dbc.Col(html.H1('Pollution Tracker', className='text-center my-4'), width=12),
-        justify='center',
-        align='center',
-        className='g-0',  # No gutters
+        dbc.Row([
+        dbc.Col(html.H1('Pollution Tracker', className='text-center my-4'), width=6),
+        dbc.Col(collapse_button,md=3)
+        ], justify='end', align='center', className='my-4 g-0',  # No gutters
     ),
         dbc.Row(pollutant_filter, justify="center", style={'color': 'white'}),
         dbc.Row([
@@ -146,6 +224,7 @@ def get_layout(data):
             ]), width=2),
         ], justify="center"),
         html.Hr(style={'borderTop': '1px solid white'}),
+        dbc.Row(collapse_section, style={'color': 'white'}),
         # Cards with default background from CSS
         dbc.Card([
             dbc.CardHeader("Worldwide Comparison", className="font-weight-bold"),
