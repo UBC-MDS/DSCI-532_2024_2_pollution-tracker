@@ -8,7 +8,7 @@ def get_filters(data):
         html.Label('Select pollutant:'),
         dcc.RadioItems(
             id='pollutant_type_filter',
-            options=[{'label': i, 'value': i} for i in ['PM2.5', 'SO2', 'NO', 'CO', 'NOX', 'NO2', 'PM1', 'PM10']],
+            options=[{'label': i, 'value': i} for i in ['PM2.5', 'PM10', 'CO', 'SO2', 'NO2', 'O3']],
             value='PM2.5',
             labelStyle={'display': 'inline-block', 'margin-right': '20px'}
         )
