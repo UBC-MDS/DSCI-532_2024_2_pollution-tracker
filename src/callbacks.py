@@ -231,7 +231,7 @@ def register_callbacks(app, data):
             fill=alt.Color('most_frequent_cat:N', scale=alt.Scale(domain=list(category_color_scale.keys()), range=list(category_color_scale.values())), legend=None),
             tooltip=[
                 alt.Tooltip('countryname:N', title='Country'),
-                alt.Tooltip('mean_value:Q', title='AQI value'),
+                alt.Tooltip('mean_value:Q', title='AQI value', format='.2f'),
                 alt.Tooltip('most_frequent_cat:N', title='AQI category')
             ]
         ).properties(
@@ -283,7 +283,7 @@ def register_callbacks(app, data):
                 color=alt.Color('countryname:N', legend=alt.Legend(title='Country')),
                 tooltip=[
                 alt.Tooltip('time_hour:T', title='Date', format='%Y-%m-%d'),
-                alt.Tooltip('AQI:Q', title='AQI Value'),
+                alt.Tooltip('AQI:Q', title='AQI Value', format='.2f'),
                 alt.Tooltip('countryname:N', title='Country')
                 ]
             ).properties(
