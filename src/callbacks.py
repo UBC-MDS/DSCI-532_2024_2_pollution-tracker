@@ -22,7 +22,7 @@ def register_callbacks(app, data):
             Input("region_filter", "value"),
         ]
     )
-    @functools.lru_cache()
+    #@functools.lru_cache()
     def update_country_options(selected_pollutant, start_year, start_month, end_year, end_month, regions):
         start_date_str = f"{start_year}-{start_month:02d}"
         end_date_str = f"{end_year}-{end_month:02d}"
