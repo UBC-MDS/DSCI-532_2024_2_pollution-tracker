@@ -33,10 +33,10 @@ def get_filters(data):
             id='country_filter',
             options=[{"label": country, "value": country} for country in unique_countries],
             multi=True,
-            placeholder='Select multiple countries...'
+            placeholder='Select up to 4 countries...'
         )
     ])
-
+    
     return pollutant_filter, region_filter, country_filter
 
 def get_datepickers():
@@ -204,11 +204,17 @@ data_summary = html.Div([
                 children = [
                     dash_table.DataTable(
                         id='data-summary-table',
+                        style_table={
+                        'height': '300px',      
+                        'overflowY': 'scroll',
+                        'overflowX': 'scroll'     
+                        },
                         style_cell={'textAlign': 'center'},
                         style_header={
                             'backgroundColor': 'white',
                             'fontWeight': 'bold'},)
-                            ])
+                            ]),
+                            html.Label('Note: You may need to scroll for multi-country detail'),
 ], style={'width': '100%'})
 
 trend_chart = html.Div([

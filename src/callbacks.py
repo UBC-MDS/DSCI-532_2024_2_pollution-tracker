@@ -266,6 +266,9 @@ def register_callbacks(app, data):
         if countries:
             if not isinstance(countries, list):
                 countries = [countries]
+# Limit the number of countries to a maximum of four
+            if len(countries) > 4:
+                countries = countries[:4]
             filtered_data = filtered_data[data['countryname'].isin(countries)]
         
         filtered_data['time'] = filtered_data['time'].astype(str)
