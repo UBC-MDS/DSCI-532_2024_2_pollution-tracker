@@ -33,7 +33,7 @@ def get_filters(data):
             id='country_filter',
             options=[{"label": country, "value": country} for country in unique_countries],
             multi=True,
-            placeholder='Select multiple countries...'
+            placeholder='Select up to 4 countries...'
         )
     ])
 
