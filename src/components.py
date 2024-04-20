@@ -182,7 +182,7 @@ collapse_section = dbc.Collapse(
 )
 
 graph_placeholder = html.Div([
-    html.Label('Worldwide Distribution', style={'fontSize': '29px', 'textAlign': 'center'}),
+    html.H3('Worldwide Distribution'),
     dcc.Loading(type='circle',
                 children = [dcc.Graph(id='graph')]),  # Placeholder for the pollution map
 ])
