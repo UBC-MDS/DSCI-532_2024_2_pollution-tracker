@@ -132,7 +132,9 @@ def register_callbacks(app, data):
             locations='countryname',
             color='AQI_cat',
             featureidkey="properties.admin",
-            color_discrete_map=category_color_scale 
+            color_discrete_map=category_color_scale,
+            labels={'AQI_cat': "AQI Category", "countryname":'Country Name'},
+            category_orders={"AQI_cat": ["Good", "Moderate", "Unhealthy for Sensitive Groups", "Unhealthy", 'Very Unhealthy', 'Hazardous']}, 
         )
 
         if regions and len(regions) == 0:
@@ -152,7 +154,7 @@ def register_callbacks(app, data):
                 projection_scale = projection_scale
             ),
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
-            clickmode='event+select'
+            clickmode='event+select',
         )
 
         for trace in map.data:
@@ -224,7 +226,7 @@ def register_callbacks(app, data):
 
         bar = alt.Chart(aggregated_data).mark_bar().encode(
             x=alt.X('mean_value:Q', title='Average AQI Value'),
-            y=alt.Y('countryname:N', title='Country', sort='-x'),
+            y=alt.Y('countryname:N', title=None, sort='-x'),
             fill=alt.Color('most_frequent_cat:N', scale=alt.Scale(domain=list(category_color_scale.keys()), range=list(category_color_scale.values())), legend=None),
             tooltip=[
                 alt.Tooltip('countryname:N', title='Country'),
