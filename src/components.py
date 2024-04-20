@@ -36,7 +36,7 @@ def get_filters(data):
             placeholder='Select up to 4 countries...'
         )
     ])
-
+    
     return pollutant_filter, region_filter, country_filter
 
 def get_datepickers():
