@@ -132,7 +132,8 @@ def register_callbacks(app, data):
             locations='countryname',
             color='AQI_cat',
             featureidkey="properties.admin",
-            color_discrete_map=category_color_scale 
+            color_discrete_map=category_color_scale,
+            labels={'AQI_cat': "AQI Category"} 
         )
 
         if regions and len(regions) == 0:
@@ -152,7 +153,7 @@ def register_callbacks(app, data):
                 projection_scale = projection_scale
             ),
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
-            clickmode='event+select'
+            clickmode='event+select',
         )
 
         for trace in map.data:
