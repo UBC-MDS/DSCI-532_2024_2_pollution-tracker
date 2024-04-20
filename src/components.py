@@ -204,6 +204,11 @@ data_summary = html.Div([
                 children = [
                     dash_table.DataTable(
                         id='data-summary-table',
+                        style_table={
+                        'height': '300px',      
+                        'overflowY': 'auto',
+                        'overflowX': 'auto'     
+                        },
                         style_cell={'textAlign': 'center'},
                         style_header={
                             'backgroundColor': 'white',
