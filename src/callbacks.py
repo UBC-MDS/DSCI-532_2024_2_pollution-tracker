@@ -4,6 +4,7 @@ import altair as alt
 alt.data_transformers.enable("vegafusion")
 from dash.dependencies import Input, Output, State
 import json
+import functools
 
 def register_callbacks(app, data):
     # Update country options based on filters
@@ -18,6 +19,7 @@ def register_callbacks(app, data):
             Input("region_filter", "value"),
         ]
     )
+    @functools.lru_cache()
     def update_country_options(selected_pollutant, start_year, start_month, end_year, end_month, regions):
         start_date_str = f"{start_year}-{start_month:02d}"
         end_date_str = f"{end_year}-{end_month:02d}"
@@ -35,7 +37,7 @@ def register_callbacks(app, data):
 
         unique_countries = filtered_data['countryname'].unique()
         return [{'label': country, 'value': country} for country in unique_countries]
-
+    
     @app.callback(
         Output('region_filter', 'options'),
         [
@@ -46,6 +48,7 @@ def register_callbacks(app, data):
         Input("end_month", "value"),
         ]
     )
+    @functools.lru_cache()
     def update_region_options(selected_pollutant, start_year, start_month, end_year, end_month):
         start_date_str = f"{start_year}-{start_month:02d}"
         end_date_str = f"{end_year}-{end_month:02d}"
@@ -65,6 +68,7 @@ def register_callbacks(app, data):
         Output('country_filter', 'value'),
         [Input('first_country_name', 'children')]
     )
+    @functools.lru_cache()
     def set_country_filter_default(first_country):
         return first_country
     
@@ -73,6 +77,7 @@ def register_callbacks(app, data):
         Input("collapse-button", "n_clicks"),
         State("collapse", "is_open"),  # Pass the current "state" of the component (is it open or not)
     )
+    @functools.lru_cache()
     def toggle_collapse(n, is_open):
         print(n)  # The number of times the button has been clicked
         print(is_open)  # Whether the collapse is open or not
@@ -89,7 +94,6 @@ def register_callbacks(app, data):
         Input("end_month", "value"),
         State('selected-countries', 'data')
     )
-    
     def display_choropleth(selected_pollutant, regions, start_year, start_month, end_year, end_month, selected_countries):
         region_centers = {
         'Asia': {'lat': 34.0479, 'lon': 100.6197},
@@ -255,7 +259,6 @@ def register_callbacks(app, data):
         Input("end_year", "value"),
         Input("end_month", "value"),
     )
-
     def plot_line(pollutant, countries, start_year, start_month, end_year, end_month):
         start_date_str = f"{start_year}-{start_month:02d}"
         end_date_str = f"{end_year}-{end_month:02d}"
@@ -265,7 +268,6 @@ def register_callbacks(app, data):
         filtered_data = data[
             (data['time'] >= start_date) &
             (data['time'] <= end_date) &
-            #(data['countryname'].isin(countries)) &
             (data['pollutant'] == pollutant)
         ]
         if countries:
@@ -310,7 +312,6 @@ def register_callbacks(app, data):
         Input("end_year", "value"),
         Input("end_month", "value"),
     )
-
     def summary(pollutant, countries, start_year, start_month, end_year, end_month):
         start_date_str = f"{start_year}-{start_month:02d}"
         end_date_str = f"{end_year}-{end_month:02d}"
@@ -320,7 +321,6 @@ def register_callbacks(app, data):
         filtered_data = data[
             (data['time'] >= start_date) &
             (data['time'] <= end_date) &
-            #(data['countryname'].isin(countries)) &
             (data['pollutant'] == pollutant)
         ]
         
