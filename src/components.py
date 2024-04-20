@@ -33,7 +33,7 @@ def get_filters(data):
             id='country_filter',
             options=[{"label": country, "value": country} for country in unique_countries],
             multi=True,
-            placeholder='Select multiple countries...'
+            placeholder='Select up to 4 countries...'
         )
     ])
 
@@ -204,6 +204,11 @@ data_summary = html.Div([
                 children = [
                     dash_table.DataTable(
                         id='data-summary-table',
+                        style_table={
+                        'height': '300px',      
+                        'overflowY': 'auto',
+                        'overflowX': 'auto'     
+                        },
                         style_cell={'textAlign': 'center'},
                         style_header={
                             'backgroundColor': 'white',
