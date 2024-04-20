@@ -133,7 +133,8 @@ def register_callbacks(app, data):
             color='AQI_cat',
             featureidkey="properties.admin",
             color_discrete_map=category_color_scale,
-            labels={'AQI_cat': "AQI Category"} 
+            labels={'AQI_cat': "AQI Category"},
+            category_orders={"AQI_cat": ["Good", "Moderate", "Unhealthy for Sensitive Groups", "Unhealthy", 'Very Unhealthy', 'Hazardous']}, 
         )
 
         if regions and len(regions) == 0:
