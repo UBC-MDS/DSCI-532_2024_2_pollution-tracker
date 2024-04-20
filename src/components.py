@@ -4,31 +4,34 @@ import dash_vega_components as dvc
 from dash import dash_table
 
 def get_filters(data):
+    pollutants = ['PM2.5', 'PM10', 'CO', 'SO2', 'NO2', 'O3']
     pollutant_filter = html.Div([
         html.Label('Select pollutant:'),
         dcc.RadioItems(
             id='pollutant_type_filter',
-            options=[{'label': i, 'value': i} for i in ['PM2.5', 'PM10', 'CO', 'SO2', 'NO2', 'O3']],
+            options=[{'label': i, 'value': i} for i in pollutants],
             value='PM2.5',
             labelStyle={'display': 'inline-block', 'margin-right': '20px'}
         )
     ], style={'textAlign': 'center'})
 
+    unique_continents = data['continent'].unique()
     region_filter = html.Div([
         html.Label('Select region(s):'),
         dcc.Dropdown(
             id='region_filter',
-            options=[{"label": region, "value": region} for region in data['continent'].unique()],
+            options=[{"label": region, "value": region} for region in unique_continents],
             multi=True,
             placeholder='Select multiple continents...'
         )
     ])
 
+    unique_countries = data['countryname'].unique()
     country_filter = html.Div([
         html.Label('Select countries:'),
         dcc.Dropdown(
             id='country_filter',
-            options=[{"label": country, "value": country} for country in data['countryname'].unique()],
+            options=[{"label": country, "value": country} for country in unique_countries],
             multi=True,
             placeholder='Select multiple countries...'
         )

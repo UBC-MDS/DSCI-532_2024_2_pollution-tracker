@@ -4,6 +4,10 @@ import altair as alt
 alt.data_transformers.enable("vegafusion")
 from dash.dependencies import Input, Output, State
 import json
+import functools
+
+with open("../data/raw/custom.geo.json", "r", encoding="utf-8") as f:
+            countries_geojson = json.load(f)
 
 def register_callbacks(app, data):
     # Update country options based on filters
@@ -18,24 +22,23 @@ def register_callbacks(app, data):
             Input("region_filter", "value"),
         ]
     )
+    #@functools.lru_cache()
     def update_country_options(selected_pollutant, start_year, start_month, end_year, end_month, regions):
         start_date_str = f"{start_year}-{start_month:02d}"
         end_date_str = f"{end_year}-{end_month:02d}"
         start_date = pd.to_datetime(start_date_str).date()
         end_date = pd.to_datetime(end_date_str).date()
 
-        filtered_data = data[
-            (data['pollutant'] == selected_pollutant) &
-            (data['time'] >= start_date) &
-            (data['time'] <= end_date)
-        ]
+        filtered_data = data.query(
+            "pollutant == @selected_pollutant and @start_date <= time <= @end_date"
+            )
 
         if regions:
             filtered_data = filtered_data[filtered_data['continent'].isin(regions)]
 
         unique_countries = filtered_data['countryname'].unique()
         return [{'label': country, 'value': country} for country in unique_countries]
-
+    
     @app.callback(
         Output('region_filter', 'options'),
         [
@@ -46,17 +49,16 @@ def register_callbacks(app, data):
         Input("end_month", "value"),
         ]
     )
+    @functools.lru_cache()
     def update_region_options(selected_pollutant, start_year, start_month, end_year, end_month):
         start_date_str = f"{start_year}-{start_month:02d}"
         end_date_str = f"{end_year}-{end_month:02d}"
         start_date = pd.to_datetime(start_date_str).date()
         end_date = pd.to_datetime(end_date_str).date()
 
-        filtered_data = data[
-            (data['pollutant'] == selected_pollutant) &
-            (data['time'] >= start_date) &
-            (data['time'] <= end_date)
-        ]
+        filtered_data = data.query(
+            "pollutant == @selected_pollutant and @start_date <= time <= @end_date"
+            )
 
         unique_continent = filtered_data['continent'].unique()
         return [{'label': continent, 'value': continent} for continent in unique_continent]
@@ -65,6 +67,7 @@ def register_callbacks(app, data):
         Output('country_filter', 'value'),
         [Input('first_country_name', 'children')]
     )
+    @functools.lru_cache()
     def set_country_filter_default(first_country):
         return first_country
     
@@ -73,6 +76,7 @@ def register_callbacks(app, data):
         Input("collapse-button", "n_clicks"),
         State("collapse", "is_open"),  # Pass the current "state" of the component (is it open or not)
     )
+    @functools.lru_cache()
     def toggle_collapse(n, is_open):
         print(n)  # The number of times the button has been clicked
         print(is_open)  # Whether the collapse is open or not
@@ -89,7 +93,6 @@ def register_callbacks(app, data):
         Input("end_month", "value"),
         State('selected-countries', 'data')
     )
-    
     def display_choropleth(selected_pollutant, regions, start_year, start_month, end_year, end_month, selected_countries):
         region_centers = {
         'Asia': {'lat': 34.0479, 'lon': 100.6197},
@@ -104,16 +107,10 @@ def register_callbacks(app, data):
         end_date_str = f"{end_year}-{end_month:02d}"
         start_date = pd.to_datetime(start_date_str).date()
         end_date = pd.to_datetime(end_date_str).date()
-
-        with open("../data/raw/custom.geo.json", "r", encoding="utf-8") as f:
-            countries_geojson = json.load(f)
         
-        df = data
-        filtered_data = data[
-            (data['pollutant'] == selected_pollutant) &
-            (data['time'] >= start_date) &
-            (data['time'] <= end_date)
-        ]
+        filtered_data = data.query(
+            "pollutant == @selected_pollutant and @start_date <= time <= @end_date"
+            )
 
         if regions:
             filtered_data = filtered_data[filtered_data['continent'].isin(regions)]
@@ -231,7 +228,7 @@ def register_callbacks(app, data):
             fill=alt.Color('most_frequent_cat:N', scale=alt.Scale(domain=list(category_color_scale.keys()), range=list(category_color_scale.values())), legend=None),
             tooltip=[
                 alt.Tooltip('countryname:N', title='Country'),
-                alt.Tooltip('mean_value:Q', title='AQI value'),
+                alt.Tooltip('mean_value:Q', title='AQI value', format='.2f'),
                 alt.Tooltip('most_frequent_cat:N', title='AQI category')
             ]
         ).properties(
@@ -255,7 +252,6 @@ def register_callbacks(app, data):
         Input("end_year", "value"),
         Input("end_month", "value"),
     )
-
     def plot_line(pollutant, countries, start_year, start_month, end_year, end_month):
         start_date_str = f"{start_year}-{start_month:02d}"
         end_date_str = f"{end_year}-{end_month:02d}"
@@ -265,7 +261,6 @@ def register_callbacks(app, data):
         filtered_data = data[
             (data['time'] >= start_date) &
             (data['time'] <= end_date) &
-            #(data['countryname'].isin(countries)) &
             (data['pollutant'] == pollutant)
         ]
         if countries:
@@ -283,7 +278,7 @@ def register_callbacks(app, data):
                 color=alt.Color('countryname:N', legend=alt.Legend(title='Country')),
                 tooltip=[
                 alt.Tooltip('time_hour:T', title='Date', format='%Y-%m-%d'),
-                alt.Tooltip('AQI:Q', title='AQI Value'),
+                alt.Tooltip('AQI:Q', title='AQI Value', format='.2f'),
                 alt.Tooltip('countryname:N', title='Country')
                 ]
             ).properties(
@@ -310,7 +305,6 @@ def register_callbacks(app, data):
         Input("end_year", "value"),
         Input("end_month", "value"),
     )
-
     def summary(pollutant, countries, start_year, start_month, end_year, end_month):
         start_date_str = f"{start_year}-{start_month:02d}"
         end_date_str = f"{end_year}-{end_month:02d}"
@@ -320,7 +314,6 @@ def register_callbacks(app, data):
         filtered_data = data[
             (data['time'] >= start_date) &
             (data['time'] <= end_date) &
-            #(data['countryname'].isin(countries)) &
             (data['pollutant'] == pollutant)
         ]
         
