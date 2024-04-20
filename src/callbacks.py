@@ -226,7 +226,7 @@ def register_callbacks(app, data):
 
         bar = alt.Chart(aggregated_data).mark_bar().encode(
             x=alt.X('mean_value:Q', title='Average AQI Value'),
-            y=alt.Y('countryname:N', title='Country', sort='-x'),
+            y=alt.Y('countryname:N', title=None, sort='-x'),
             fill=alt.Color('most_frequent_cat:N', scale=alt.Scale(domain=list(category_color_scale.keys()), range=list(category_color_scale.values())), legend=None),
             tooltip=[
                 alt.Tooltip('countryname:N', title='Country'),
