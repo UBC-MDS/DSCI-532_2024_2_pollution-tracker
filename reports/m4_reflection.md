@@ -27,6 +27,23 @@
 ### 5. Documentation:
 - Enhanced the README file to clearly state the questions our dashboard addresses and the functionality it provides.
 
+## Divergence from Original Sketch
+
+- We have introduced a data summary section that provides summary statistics for the filtered data. This addition helps users understand the number of observations being plotted and their value range.
+- We repositioned the filters to centralize the pollutant and time selections at the top of the dashboard, enhancing the logical flow and making it clearer for users to understand which filters control specific parts of the dashboard. We also strategically separated the map and trend chart with corresponding region and country filters to further improve usability.
+
+## Divergence from Best Practices
+
+- The dashboard now performs significantly better on render.com due to our targeted performance enhancements. We believe that the dashboard is currently optimized based on the available data.
+
+## Strengths and Weaknesses
+
+### Advantages:
+- **Efficiency**: The dashboard loads efficiently, with a neat, concise, and clear visual styling.
+- **User Experience**: Filters are thoughtfully designed to enhance user interaction, including features such as centering the map post-selection and filtering out choices with no available data to streamline the user experience.
+
+### Disadvantages:
+- **Limited Chart Variety**: The variety of charts is currently limited due to time constraints and the availability of data. This restriction has impacted our ability to add more diverse features and perform broader analyses.
 
 ## Future Improvements and Additions
 
