@@ -206,14 +206,15 @@ data_summary = html.Div([
                         id='data-summary-table',
                         style_table={
                         'height': '300px',      
-                        'overflowY': 'auto',
-                        'overflowX': 'auto'     
+                        'overflowY': 'scroll',
+                        'overflowX': 'scroll'     
                         },
                         style_cell={'textAlign': 'center'},
                         style_header={
                             'backgroundColor': 'white',
                             'fontWeight': 'bold'},)
-                            ])
+                            ]),
+                            html.Label('Note: You may need to scroll for multi-country detail'),
 ], style={'width': '100%'})
 
 trend_chart = html.Div([
