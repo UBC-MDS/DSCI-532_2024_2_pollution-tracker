@@ -6,7 +6,7 @@ from callbacks import register_callbacks
 
 # Create a Dash application
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-app.title = "Air Quality Tracker"
+app.title = "Pollution Tracker"
 
 # Load data
 data = load_data()

@@ -33,10 +33,10 @@ def get_filters(data):
             id='country_filter',
             options=[{"label": country, "value": country} for country in unique_countries],
             multi=True,
-            placeholder='Select multiple countries...'
+            placeholder='Select up to 4 countries...'
         )
     ])
-
+    
     return pollutant_filter, region_filter, country_filter
 
 def get_datepickers():
@@ -111,8 +111,8 @@ collapse_section = dbc.Collapse(
         ),
         html.P(
             [
-                "For more information, please ",
-                html.A("visit here", href="https://github.com/UBC-MDS/DSCI-532_2024_2_pollution-tracker", target="_blank"),
+                "For more information on AQI, please ",
+                html.A("visit our repo", href="https://github.com/UBC-MDS/DSCI-532_2024_2_pollution-tracker", target="_blank"),
                 "."
             ],
             style={'color': 'white'}
@@ -128,9 +128,10 @@ collapse_section = dbc.Collapse(
         ),
         html.P(
             [
-                html.Strong("NO (Nitric Oxide):"),
-                " Nitric oxide is a colorless gas that is a by-product of combustion processes, particularly at high temperatures found in car engines and power plants. "
-                "While not directly harmful, NO rapidly transforms into nitrogen dioxide (NO2) in the atmosphere, which is a major air pollutant and contributes to the formation of smog and acid rain."
+                html.Strong("PM10 (Particulate Matter 10):"),
+                " PM10 includes particles that are 10 micrometers or smaller in diameter. "
+                "These particles are smaller than the thickness of a human hair and can be inhaled into the respiratory tract. "
+                "Sources of PM10 include dust from roads, construction sites, and other similar sources of fine particles."
             ],
             style={'color': 'white'}
         ),
@@ -144,18 +145,34 @@ collapse_section = dbc.Collapse(
         ),
         html.P(
             [
-                html.Strong("NOx (Nitrogen Oxides):"),
-                " NOx is a collective term for nitrogen oxides, including NO and NO2. These gases are mainly produced from vehicle emissions and industrial activities. "
-                "NOx gases are contributors to environmental issues such as smog, acid rain, and can exacerbate respiratory diseases such as asthma by irritating the airways."
+                html.Strong("SO2 (Sulfur Dioxide):"),
+                " Sulfur dioxide is a toxic gas that forms when sulfur-containing fuel is burnt, as well as during volcanic activity and some industrial activities."
+                "Breathing in SO2 can exacerbate respiratory diseases such as asthma by irritating the airways, leading to shortness of breath and chest tightness."
             ],
             style={'color': 'white'}
         ),
         html.P(
             [
-                html.Strong("PM10 (Particulate Matter 10):"),
-                " PM10 includes particles that are 10 micrometers or smaller in diameter. "
-                "These particles are smaller than the thickness of a human hair and can be inhaled into the respiratory tract. "
-                "Sources of PM10 include dust from roads, construction sites, and other similar sources of fine particles."
+                html.Strong("NO2 (Nitrogen Dioxide):"),
+                " Nitrogen dioxide forms when fuels like coal, oil, natural gas, and diesel are burnt at high temperatures."
+                "NO2 can cause coughing and wheezing, inflammation of the lungs, and reduce the ability of the lungs to function properly."
+            ],
+            style={'color': 'white'}
+        ),
+        html.P(
+            [
+                html.Strong("O3 (Ozone):"),
+                " Ozone is a dangerous and widespread pollutant that begins invisible but becomes smog as it mixes with other pollutants. "
+                "This pollutant may shield us from the sun's radiation in our atmosphere, but damages lung tissues when inhaled. "
+                "Ozone is formed when nitrogen oxides, volatile organic compounds, and sunlight react with each other."
+            ],
+            style={'color': 'white'}
+        ),
+        html.P(
+            [
+                "To learn more about common air pollutants ",
+                html.A("visit here", href="https://www.lung.org/clean-air/outdoors/what-makes-air-unhealthy", target="_blank"),
+                "."
             ],
             style={'color': 'white'}
         ),
@@ -165,36 +182,49 @@ collapse_section = dbc.Collapse(
 )
 
 graph_placeholder = html.Div([
-    html.Label('Worldwide Distribution', style={'fontSize': '29px', 'textAlign': 'center'}),
-    dcc.Graph(id='graph'),  # Placeholder for the pollution map
+    html.H3('Worldwide Distribution'),
+    dcc.Loading(type='circle',
+                children = [dcc.Graph(id='graph')]),  # Placeholder for the pollution map
 ])
 
 top_countries_chart = html.Div([
     html.H3('Top 15 Countries of Pollutant'),
-    dvc.Vega(id='top_countries_chart',
-             opt={"renderer": "svg", "actions": False},
-             spec={}, 
-             style={'width': '100%', 'height': '100%'})
+    dcc.Loading(type='circle', 
+                children=[
+                    dvc.Vega(id='top_countries_chart',
+                        opt={"renderer": "svg", "actions": False},
+                        spec={}, 
+                        style={'width': '100%', 'height': '100%'})
+                        ])
 ])
 
 data_summary = html.Div([
     html.H3('Data Summary'),
-    dash_table.DataTable(
-        id='data-summary-table',
-        style_cell={'textAlign': 'center'},
-        style_header={
-            'backgroundColor': 'white',
-            'fontWeight': 'bold'
-        },
-    )
+    dcc.Loading(type='circle',
+                children = [
+                    dash_table.DataTable(
+                        id='data-summary-table',
+                        style_table={
+                        'height': '300px',      
+                        'overflowY': 'scroll',
+                        'overflowX': 'scroll'     
+                        },
+                        style_cell={'textAlign': 'center'},
+                        style_header={
+                            'backgroundColor': 'white',
+                            'fontWeight': 'bold'},)
+                            ]),
+                            html.Label('Note: You may need to scroll for multi-country detail'),
 ], style={'width': '100%'})
 
 trend_chart = html.Div([
     html.H3('Trend of Pollutant over time'),
-    dvc.Vega(id='trend_chart', 
-             opt={"renderer": "svg", "actions": False}, 
-             spec={}, 
-             style={'width': '100%', 'height': '100%'})
+    dcc.Loading(type='circle',
+                children = [
+                    dvc.Vega(id='trend_chart', 
+                        opt={"renderer": "svg", "actions": False}, 
+                        spec={}, 
+                        style={'width': '100%', 'height': '100%'})])
 ])
 
 def get_layout(data):
@@ -260,7 +290,7 @@ def get_layout(data):
                         style={"font-size": "12px", 'color': 'white'}),
                     html.A("GitHub Repository", href="https://github.com/UBC-MDS/DSCI-532_2024_2_pollution-tracker",
                         target="_blank", style={"font-size": "12px", 'color': '#00BFFF'}),
-                    html.P("Last updated on April 7, 2024",
+                    html.P("Last updated on April 20th, 2024",
                         style={"font-size": "12px", 'color': 'white'}),
                 ])
             ], width=12),
