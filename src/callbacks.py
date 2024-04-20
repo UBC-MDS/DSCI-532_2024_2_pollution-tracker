@@ -5,6 +5,10 @@ alt.data_transformers.enable("vegafusion")
 from dash.dependencies import Input, Output, State
 import json
 import functools
+import vegafusion as vf
+
+# Configure DuckDB connection
+vf.runtime.set_connection("duckdb")
 
 with open("../data/raw/custom.geo.json", "r", encoding="utf-8") as f:
             countries_geojson = json.load(f)
