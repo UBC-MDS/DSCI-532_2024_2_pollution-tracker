@@ -6,6 +6,9 @@ from dash.dependencies import Input, Output, State
 import json
 import functools
 
+with open("../data/raw/custom.geo.json", "r", encoding="utf-8") as f:
+            countries_geojson = json.load(f)
+
 def register_callbacks(app, data):
     # Update country options based on filters
     @app.callback(
@@ -108,9 +111,6 @@ def register_callbacks(app, data):
         end_date_str = f"{end_year}-{end_month:02d}"
         start_date = pd.to_datetime(start_date_str).date()
         end_date = pd.to_datetime(end_date_str).date()
-
-        with open("../data/raw/custom.geo.json", "r", encoding="utf-8") as f:
-            countries_geojson = json.load(f)
         
         df = data
         filtered_data = data[
