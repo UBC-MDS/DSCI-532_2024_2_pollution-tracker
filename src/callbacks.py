@@ -29,11 +29,9 @@ def register_callbacks(app, data):
         start_date = pd.to_datetime(start_date_str).date()
         end_date = pd.to_datetime(end_date_str).date()
 
-        filtered_data = data[
-            (data['pollutant'] == selected_pollutant) &
-            (data['time'] >= start_date) &
-            (data['time'] <= end_date)
-        ]
+        filtered_data = data.query(
+            "pollutant == @selected_pollutant and @start_date <= time <= @end_date"
+            )
 
         if regions:
             filtered_data = filtered_data[filtered_data['continent'].isin(regions)]
@@ -58,11 +56,9 @@ def register_callbacks(app, data):
         start_date = pd.to_datetime(start_date_str).date()
         end_date = pd.to_datetime(end_date_str).date()
 
-        filtered_data = data[
-            (data['pollutant'] == selected_pollutant) &
-            (data['time'] >= start_date) &
-            (data['time'] <= end_date)
-        ]
+        filtered_data = data.query(
+            "pollutant == @selected_pollutant and @start_date <= time <= @end_date"
+            )
 
         unique_continent = filtered_data['continent'].unique()
         return [{'label': continent, 'value': continent} for continent in unique_continent]
@@ -112,12 +108,9 @@ def register_callbacks(app, data):
         start_date = pd.to_datetime(start_date_str).date()
         end_date = pd.to_datetime(end_date_str).date()
         
-        df = data
-        filtered_data = data[
-            (data['pollutant'] == selected_pollutant) &
-            (data['time'] >= start_date) &
-            (data['time'] <= end_date)
-        ]
+        filtered_data = data.query(
+            "pollutant == @selected_pollutant and @start_date <= time <= @end_date"
+            )
 
         if regions:
             filtered_data = filtered_data[filtered_data['continent'].isin(regions)]
